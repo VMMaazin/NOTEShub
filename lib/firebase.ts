@@ -3,13 +3,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBHe5Kff_11bMVCkIzAkF6XjXHxb8wGxA0",
-  authDomain: "smart-college-notes.firebaseapp.com",
-  projectId: "smart-college-notes",
-  storageBucket: "smart-college-notes.appspot.com",
-  messagingSenderId: "243008726342",
-  appId: "1:243008726342:web:52271db2600a071f7a3147",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
+
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
