@@ -1,9 +1,13 @@
-"use client";
-
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
-import Navbar from "@/components/Navbar";
-import { AuthProvider } from "@/context/AuthContext";
+import Providers from "./providers";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "NOTEShub",
+  description: "College notes storage and sharing app",
+  manifest: "/manifest.json",
+  themeColor: "#2563eb",
+};
 
 export default function RootLayout({
   children,
@@ -13,16 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-        >
-          <AuthProvider>
-            <Navbar />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
