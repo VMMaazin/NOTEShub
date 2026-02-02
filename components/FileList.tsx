@@ -32,6 +32,11 @@ type FileItem = {
   publicId: string;
 };
 
+// ✅ Force Cloudinary download
+function getDownloadUrl(url: string) {
+  return url.replace("/upload/", "/upload/fl_attachment/");
+}
+
 export default function FileList({
   semester,
   subject,
@@ -105,12 +110,13 @@ export default function FileList({
 
   return (
     <>
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {files.map((file) => (
           <li
             key={file.id}
-            className="flex items-center justify-between px-3 py-2 border border-[#30363d] rounded-md bg-[#0d1117]"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border border-[#30363d] rounded-md bg-[#0d1117]"
           >
+            {/* File name */}
             {editingId === file.id ? (
               <input
                 value={newName}
@@ -119,7 +125,7 @@ export default function FileList({
                   if (e.key === "Enter") handleRename(file);
                   if (e.key === "Escape") setEditingId(null);
                 }}
-                className="bg-[#161b22] border border-[#30363d] px-2 py-1 text-sm rounded w-full mr-4"
+                className="bg-[#161b22] border border-[#30363d] px-2 py-1 text-sm rounded w-full"
                 autoFocus
               />
             ) : (
@@ -128,18 +134,20 @@ export default function FileList({
               </span>
             )}
 
-            <div className="flex gap-3 text-xs">
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2 text-xs">
+              {/* View */}
               <button
                 onClick={() => setActivePdf(file.url)}
-                className="text-[#58a6ff] hover:underline"
+                className="px-3 py-1.5 rounded-md border border-[#58a6ff] text-[#58a6ff] hover:bg-[#58a6ff]/10 transition"
               >
                 View
               </button>
 
+              {/* Download */}
               <a
-                href={file.url}
-                download
-                className="text-[#58a6ff] hover:underline"
+                href={getDownloadUrl(file.url)}
+                className="px-3 py-1.5 rounded-md bg-[#238636] text-white hover:bg-[#2ea043] transition"
               >
                 Download
               </a>
@@ -152,7 +160,7 @@ export default function FileList({
                         setEditingId(file.id);
                         setNewName(file.name);
                       }}
-                      className="text-[#58a6ff] hover:underline"
+                      className="px-3 py-1.5 rounded-md border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] transition"
                     >
                       Rename
                     </button>
@@ -160,7 +168,7 @@ export default function FileList({
 
                   <button
                     onClick={() => handleDelete(file)}
-                    className="text-red-400 hover:underline"
+                    className="px-3 py-1.5 rounded-md border border-red-500 text-red-400 hover:bg-red-500/10 transition"
                   >
                     Delete
                   </button>
