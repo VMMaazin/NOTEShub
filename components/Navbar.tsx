@@ -1,12 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "firebase/auth";
+import { signOut, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { user, name, loading } = useAuth();
+
+  async function handleResetPassword() {
+    if (!user?.email) {
+      alert("No email found for this account.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      alert(
+        "Password reset email sent. Please check your inbox and spam folder."
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send reset email. Try again later.");
+    }
+  }
 
   return (
     <nav className="w-full border-b border-border bg-background">
@@ -43,7 +60,19 @@ export default function Navbar() {
                 {name || user.email}
               </span>
 
-              {/* Logout button */}
+              {/* Reset password */}
+              <button
+                onClick={handleResetPassword}
+                className="px-4 py-1.5 rounded-md
+                           border border-border
+                           text-muted-foreground
+                           hover:text-foreground hover:border-foreground/40
+                           transition font-medium"
+              >
+                Reset Password
+              </button>
+
+              {/* Logout */}
               <button
                 onClick={() => signOut(auth)}
                 className="px-4 py-1.5 rounded-md

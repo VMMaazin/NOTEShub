@@ -27,27 +27,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
+      setLoading(true);
 
-        const snap = await getDoc(doc(db, "users", firebaseUser.uid));
-        if (snap.exists()) {
-          const data = snap.data();
-
-          setRole(data.role || null);
-          setName(data.name || null);
-
-          if (!data.firstLoginCompleted) {
-            window.location.href = "/onboarding";
-            return;
-          }
-        }
-      } else {
+      if (!firebaseUser) {
         setUser(null);
         setRole(null);
         setName(null);
+        setLoading(false);
+        return;
       }
 
+      setUser(firebaseUser);
+
+      const snap = await getDoc(doc(db, "users", firebaseUser.uid));
+
+      if (!snap.exists()) {
+        setRole(null);
+        setName(null);
+        setLoading(false);
+        return;
+      }
+
+      const data = snap.data();
+
+      setRole(data.role || null);
+      setName(data.name || null);
+
+      // ✅ No forced redirects anymore
       setLoading(false);
     });
 
