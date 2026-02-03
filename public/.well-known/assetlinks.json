@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.noteshub.app",
+      "package_name": "app.vercel.noteshub_smoky.twa",
       "sha256_cert_fingerprints": [
         "4C:89:4C:9C:7B:23:B1:71:C5:00:42:56:5E:9C:0B:11:A4:B2:13:C6:E0:E8:13:20:AE:9C:94:25:A1:6C:AC:A9"
       ]
