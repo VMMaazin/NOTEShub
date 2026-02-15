@@ -1,5 +1,4 @@
-"use client";
-
+// ... (imports remain)
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -11,12 +10,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import dynamic from "next/dynamic";
+// Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
-
-const PdfViewer = dynamic(() => import("./PdfViewer"), {
-  ssr: false,
-});
 
 type Props = {
   semester: number;
@@ -44,7 +39,7 @@ export default function FileList({
   type,
 }: Props) {
   const [files, setFiles] = useState<FileItem[]>([]);
-  const [activePdf, setActivePdf] = useState<string | null>(null);
+  // Removed activePdf state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -91,7 +86,7 @@ export default function FileList({
 
     try {
       setError(null);
-      
+
       // Delete from Cloudinary
       await fetch("/api/delete-file", {
         method: "POST",
@@ -147,6 +142,10 @@ export default function FileList({
     setError(null);
   }
 
+  function openPdf(url: string) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
   if (files.length === 0) {
     return (
       <p className="text-xs text-[#8b949e]">
@@ -168,7 +167,7 @@ export default function FileList({
         {files.map((file) => (
           <li
             key={file.id}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border border-[#30363d] rounded-md bg-[#0d1117]"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border border-border rounded-md bg-card/50 hover:bg-card/80 transition-colors"
           >
             {/* File name */}
             {editingId === file.id ? (
@@ -181,26 +180,26 @@ export default function FileList({
                     if (e.key === "Escape") cancelEditing();
                   }}
                   disabled={saving}
-                  className="bg-[#161b22] border border-[#30363d] px-2 py-1 text-sm rounded flex-1 disabled:opacity-50"
+                  className="bg-background border border-input px-2 py-1 text-sm rounded flex-1 disabled:opacity-50"
                   autoFocus
                 />
                 <button
                   onClick={() => handleRename(file)}
                   disabled={saving}
-                  className="px-2 py-1 text-xs bg-[#238636] text-white rounded hover:bg-[#2ea043] disabled:opacity-50"
+                  className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                 >
                   {saving ? "Saving..." : "Save"}
                 </button>
                 <button
                   onClick={cancelEditing}
                   disabled={saving}
-                  className="px-2 py-1 text-xs border border-[#30363d] text-[#8b949e] rounded hover:text-white disabled:opacity-50"
+                  className="px-2 py-1 text-xs border border-border text-muted-foreground rounded hover:text-foreground disabled:opacity-50"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
-              <span className="text-sm truncate">
+              <span className="text-sm truncate font-medium">
                 {file.name}
               </span>
             )}
@@ -210,8 +209,8 @@ export default function FileList({
               <div className="flex flex-wrap gap-2 text-xs">
                 {/* View */}
                 <button
-                  onClick={() => setActivePdf(file.url)}
-                  className="px-3 py-1.5 rounded-md border border-[#58a6ff] text-[#58a6ff] hover:bg-[#58a6ff]/10 transition"
+                  onClick={() => openPdf(file.url)}
+                  className="px-3 py-1.5 rounded-md border border-primary text-primary hover:bg-primary/10 transition font-medium"
                 >
                   View
                 </button>
@@ -219,7 +218,7 @@ export default function FileList({
                 {/* Download */}
                 <a
                   href={getDownloadUrl(file.url)}
-                  className="px-3 py-1.5 rounded-md bg-[#238636] text-white hover:bg-[#2ea043] transition"
+                  className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium"
                 >
                   Download
                 </a>
@@ -228,14 +227,14 @@ export default function FileList({
                   <>
                     <button
                       onClick={() => startEditing(file)}
-                      className="px-3 py-1.5 rounded-md border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] transition"
+                      className="px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-foreground/50 transition"
                     >
                       Rename
                     </button>
 
                     <button
                       onClick={() => handleDelete(file)}
-                      className="px-3 py-1.5 rounded-md border border-red-500 text-red-400 hover:bg-red-500/10 transition"
+                      className="px-3 py-1.5 rounded-md border border-red-500 text-red-500 hover:bg-red-500/10 transition"
                     >
                       Delete
                     </button>
@@ -246,13 +245,6 @@ export default function FileList({
           </li>
         ))}
       </ul>
-
-      {activePdf && (
-        <PdfViewer
-          url={activePdf}
-          onClose={() => setActivePdf(null)}
-        />
-      )}
     </>
   );
 }

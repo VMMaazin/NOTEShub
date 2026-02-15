@@ -1,6 +1,9 @@
 import "./globals.css";
 import Providers from "./providers";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "NOTEShub",
@@ -16,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${inter.className} min-h-screen bg-background antialiased selection:bg-primary/20 selection:text-primary`}>
         <Providers>{children}</Providers>
       </body>
     </html>
