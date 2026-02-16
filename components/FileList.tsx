@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { Eye, Download } from "lucide-react";
 // Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
 
@@ -204,22 +205,23 @@ export default function FileList({
               </span>
             )}
 
-            {/* Actions */}
             {editingId !== file.id && (
-              <div className="flex flex-wrap gap-2 text-xs">
+              <div className="flex flex-wrap gap-4 text-xs">
                 {/* View */}
                 <button
                   onClick={() => openPdf(file.url)}
-                  className="px-3 py-1.5 rounded-md border border-primary text-primary hover:bg-primary/10 transition font-medium"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary hover:bg-primary/10 transition font-medium text-sm group"
                 >
+                  <Eye className="w-4 h-4" />
                   View
                 </button>
 
                 {/* Download */}
                 <a
                   href={getDownloadUrl(file.url)}
-                  className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium text-sm shadow-sm hover:shadow"
                 >
+                  <Download className="w-4 h-4" />
                   Download
                 </a>
 

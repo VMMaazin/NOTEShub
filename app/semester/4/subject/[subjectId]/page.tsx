@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -66,11 +67,13 @@ export default function SubjectPage() {
   return (
     <main className="max-w-7xl mx-auto px-6 py-10 space-y-8">
       {/* Back */}
+      {/* Back */}
       <Link
         href="/semester/4"
-        className="text-sm text-primary hover:underline"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-all hover:-translate-x-1 group text-sm font-medium"
       >
-        ← Back to Subjects
+        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+        Back to Subjects
       </Link>
 
       {/* Subject title */}
