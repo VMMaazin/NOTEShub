@@ -66,6 +66,17 @@ export default function Navbar() {
             Semester 4
           </Link>
 
+          {/* Downloads link */}
+          <Link
+            href="/downloads"
+            className="flex items-center px-4 py-2 rounded-full border border-border/50
+                       bg-secondary/50 text-secondary-foreground
+                       hover:bg-secondary hover:text-foreground
+                       transition-colors"
+          >
+            Downloads
+          </Link>
+
           {!loading && user ? (
             <>
               {/* User badge */}
@@ -123,6 +134,14 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               <span className="font-medium">Go to Semester 4</span>
+            </Link>
+
+            <Link
+              href="/downloads"
+              className="flex items-center gap-2 px-4 py-3 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="font-medium">Downloads</span>
             </Link>
 
             {!loading && user ? (

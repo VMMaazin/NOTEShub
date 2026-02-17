@@ -1,4 +1,3 @@
-// ... (imports remain)
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -13,6 +12,7 @@ import { db } from "@/lib/firebase";
 import { Eye, Download } from "lucide-react";
 // Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
+import DownloadModal from "./DownloadModal";
 
 type Props = {
   semester: number;
@@ -45,6 +45,7 @@ export default function FileList({
   const [newName, setNewName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [downloadingFile, setDownloadingFile] = useState<FileItem | null>(null);
 
   const { role, user } = useAuth();
   const isAuthor = role === "author" || role === "owner";
@@ -216,14 +217,14 @@ export default function FileList({
                   View
                 </button>
 
-                {/* Download */}
-                <a
-                  href={getDownloadUrl(file.url)}
+                {/* Download Button triggering Modal */}
+                <button
+                  onClick={() => setDownloadingFile(file)}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium text-sm shadow-sm hover:shadow"
                 >
                   <Download className="w-4 h-4" />
                   Download
-                </a>
+                </button>
 
                 {isAuthor && (
                   <>
@@ -247,6 +248,21 @@ export default function FileList({
           </li>
         ))}
       </ul>
+
+      {/* Download Modal - Pass enriched file object */}
+      {downloadingFile && (
+        <DownloadModal
+          isOpen={!!downloadingFile}
+          onClose={() => setDownloadingFile(null)}
+          file={{
+            ...downloadingFile,
+            semester,
+            subject,
+            module,
+            type
+          }}
+        />
+      )}
     </>
   );
 }
