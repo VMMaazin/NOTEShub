@@ -165,11 +165,13 @@ export default function DownloadsPage() {
     // Logic: Combine fetched subjects AND any subjects that have files but weren't fetched (?)
     // Primarily use fetched subjects to determine order/display, but ensure all files are shown.
 
-    const knownSubjectIds = new Set(subjects[activeSemester]?.map(s => s.subject) || []);
-    const fileSubjectIds = new Set(Object.keys(currentFilesBySubject).map(Number));
+    const knownSubjectIds = subjects[activeSemester]?.map(s => s.subject) || [];
+    const fileSubjectIds = Object.keys(currentFilesBySubject).map(Number);
 
-    // Merge IDs
-    const allSubjectIds = Array.from(new Set([...knownSubjectIds, ...fileSubjectIds])).sort((a, b) => a - b);
+    // Merge IDs safely (ES5 compatible, avoiding Set iteration downlevel issue)
+    const combinedIds = knownSubjectIds.concat(fileSubjectIds);
+    const uniqueIds = combinedIds.filter((item, index) => combinedIds.indexOf(item) === index);
+    const allSubjectIds = uniqueIds.sort((a, b) => a - b);
 
     if (loading) {
         return (
