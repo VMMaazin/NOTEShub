@@ -88,7 +88,7 @@ export default function UploadFile({
       {uploading ? "Uploading…" : "Upload"}
       <input
         type="file"
-        accept=".pdf"
+        accept=".pdf,.doc,.docx,.ppt,.pptx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
         hidden
         onChange={handleUpload}
         disabled={uploading}
