@@ -5,6 +5,13 @@ const withPWA = require("next-pwa")({
   disable: process.env.NODE_ENV === "development",
   register: true,
   skipWaiting: true,
+  fallbacks: {
+    document: "/offline", // Serve the offline fallback page
+  },
+  cacheOnFrontEndNav: true,
+  cacheStartUrl: true,
+  dynamicStartUrl: false,
+  reloadOnOnline: true,
 });
 
 const nextConfig = {
