@@ -80,7 +80,10 @@ export default function PdfViewerModal({
                                 centerOnInit
                                 wheel={{ step: 0.1 }}
                             >
-                                <TransformComponent wrapperClass="w-full !h-full" contentClass="w-full !h-full">
+                                <TransformComponent
+                                    wrapperStyle={{ width: "100%", height: "100%" }}
+                                    contentStyle={{ width: "100%", height: "100%" }}
+                                >
                                     <div className="h-full w-full custom-pdf-viewer">
                                         {fileUrl ? (
                                             <Viewer
