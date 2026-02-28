@@ -9,13 +9,15 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, FileQuestion } from "lucide-react";
 // Removed dynamic import of PdfViewer
 // Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
 import DownloadModal from "./DownloadModal";
 import PdfViewerModal from "./PdfViewerModal";
 import { motion, Variants } from "framer-motion";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -56,7 +58,7 @@ export default function FileList({
   type,
 }: Props) {
   const [files, setFiles] = useState<FileItem[]>([]);
-  // Removed activePdf state
+  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -95,6 +97,7 @@ export default function FileList({
         });
       });
       setFiles(list);
+      setLoading(false);
     });
 
     return () => unsub();
@@ -104,8 +107,6 @@ export default function FileList({
     if (!confirm("Delete this file permanently?")) return;
 
     try {
-      setError(null);
-
       // Delete from Cloudinary
       await fetch("/api/delete-file", {
         method: "POST",
@@ -115,21 +116,21 @@ export default function FileList({
 
       // Delete from Firestore
       await deleteDoc(doc(db, "files", file.id));
+      toast.success("File deleted successfully!");
     } catch (err) {
       console.error("Delete error:", err);
-      setError("Failed to delete file. Check console for details.");
+      toast.error("Failed to delete file.");
     }
   }
 
   async function handleRename(file: FileItem) {
     if (!newName.trim()) {
-      setError("File name cannot be empty");
+      toast.error("File name cannot be empty");
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
 
       console.log("Attempting to rename file:", file.id);
       console.log("New name:", newName.trim());
@@ -139,11 +140,12 @@ export default function FileList({
       });
 
       console.log("Rename successful!");
+      toast.success("File renamed successfully!");
       setEditingId(null);
       setNewName("");
     } catch (err: any) {
       console.error("Rename error:", err);
-      setError(`Failed to rename: ${err.message || "Unknown error"}`);
+      toast.error(`Failed to rename: ${err.message || "Unknown error"}`);
     } finally {
       setSaving(false);
     }
@@ -152,13 +154,11 @@ export default function FileList({
   function startEditing(file: FileItem) {
     setEditingId(file.id);
     setNewName(file.name);
-    setError(null);
   }
 
   function cancelEditing() {
     setEditingId(null);
     setNewName("");
-    setError(null);
   }
 
   function openPdf(file: FileItem) {
@@ -171,22 +171,36 @@ export default function FileList({
     }
   }
 
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-16 w-full" />
+        ))}
+      </div>
+    );
+  }
+
   if (files.length === 0) {
     return (
-      <p className="text-xs text-[#8b949e]">
-        No files uploaded yet.
-      </p>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center justify-center p-8 text-center bg-card/30 border border-dashed rounded-xl"
+      >
+        <div className="p-3 bg-muted rounded-full mb-3">
+          <FileQuestion className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <h4 className="font-medium text-foreground mb-1">No files yet</h4>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          There are no uploaded documents for this section at the moment.
+        </p>
+      </motion.div>
     );
   }
 
   return (
     <>
-      {/* Error message */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-400 text-sm">
-          {error}
-        </div>
-      )}
 
       <motion.ul
         variants={containerVariants}

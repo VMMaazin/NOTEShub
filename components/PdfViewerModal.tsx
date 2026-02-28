@@ -34,14 +34,14 @@ export default function PdfViewerModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8"
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
             >
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="bg-card w-full h-[90vh] max-w-6xl rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden"
+                    className="bg-card w-full h-full flex flex-col overflow-hidden"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
@@ -78,7 +78,7 @@ export default function PdfViewerModal({
                                 minScale={1}
                                 maxScale={5}
                                 centerOnInit
-                                wheel={{ step: 0.1 }}
+                                wheel={{ step: 0.1, activationKeys: ["Control"] }}
                             >
                                 <TransformComponent
                                     wrapperStyle={{ width: "100%", height: "100%" }}

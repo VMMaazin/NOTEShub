@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "next-themes";
 import { Menu, X, GraduationCap, Sun, Moon } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const { user, name, loading } = useAuth();
@@ -22,18 +23,18 @@ export default function Navbar() {
   async function handleResetPassword() {
     // ... (same logic)
     if (!user?.email) {
-      alert("No email found for this account.");
+      toast.error("No email found for this account.");
       return;
     }
 
     try {
       await sendPasswordResetEmail(auth, user.email);
-      alert(
+      toast.success(
         "Password reset email sent. Please check your inbox and spam folder."
       );
     } catch (err) {
       console.error(err);
-      alert("Failed to send reset email. Try again later.");
+      toast.error("Failed to send reset email. Try again later.");
     }
   }
 
