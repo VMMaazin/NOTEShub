@@ -11,8 +11,10 @@ import {
 import { db } from "@/lib/firebase";
 import { Eye, Download } from "lucide-react";
 // Removed dynamic import of PdfViewer
+// Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
 import DownloadModal from "./DownloadModal";
+import PdfViewerModal from "./PdfViewerModal";
 import { motion, Variants } from "framer-motion";
 
 const containerVariants: Variants = {
@@ -60,6 +62,7 @@ export default function FileList({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloadingFile, setDownloadingFile] = useState<FileItem | null>(null);
+  const [viewingFile, setViewingFile] = useState<FileItem | null>(null);
 
   const { role, user } = useAuth();
   const isAuthor = role === "author" || role === "owner";
@@ -158,8 +161,14 @@ export default function FileList({
     setError(null);
   }
 
-  function openPdf(url: string) {
-    window.open(url, "_blank", "noopener,noreferrer");
+  function openPdf(file: FileItem) {
+    // If it's a PDF, we can use our viewer
+    if (file.url.toLowerCase().includes('.pdf') || file.url.toLowerCase().includes('cloudinary')) {
+      setViewingFile(file);
+    } else {
+      // Fallback for other file types
+      window.open(file.url, "_blank", "noopener,noreferrer");
+    }
   }
 
   if (files.length === 0) {
@@ -230,7 +239,7 @@ export default function FileList({
               <div className="flex flex-wrap gap-4 text-xs">
                 {/* View */}
                 <button
-                  onClick={() => openPdf(file.url)}
+                  onClick={() => openPdf(file)}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary hover:bg-primary/10 transition font-medium text-sm group"
                 >
                   <Eye className="w-4 h-4" />
@@ -281,6 +290,16 @@ export default function FileList({
             module,
             type
           }}
+        />
+      )}
+
+      {/* PDF Viewer Viewer Modal */}
+      {viewingFile && (
+        <PdfViewerModal
+          isOpen={!!viewingFile}
+          onClose={() => setViewingFile(null)}
+          fileUrl={viewingFile.url}
+          fileName={viewingFile.name}
         />
       )}
     </>
