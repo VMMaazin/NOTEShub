@@ -1,23 +1,49 @@
+"use client";
+
 import Link from "next/link";
-import { Lock, BookOpen, ArrowRight } from "lucide-react"; // Assuming lucide-react is available as it's common in these stacks. If not, I will revert to simple text/css or standard svgs.
-// Actually, I should check package.json first to be sure about icons.
-// For now, I will use standard SVG or just CSS styling to be safe and avoid breaking if lucide isn't there.
-// Wait, I saw "lucide-react" isn't in the file list but usually it comes with shadcn/ui.
-// Let me check package.json first to be 100% sure before importing.
-// I'll stick to safer standard HTML/CSS for now to strictly follow "don't break logic".
+import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
+};
 
 export default function HomePage() {
   return (
     <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-
-      {/* Background Decor - Adjusted for mobile */}
-      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+      {/* Background Decor */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
+      >
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[200px] w-[200px] sm:h-[310px] sm:w-[310px] rounded-full bg-primary/20 opacity-20 blur-[80px] sm:blur-[100px]"></div>
-      </div>
+      </motion.div>
 
-      <div className="max-w-5xl w-full space-y-8 sm:space-y-12 py-8 sm:py-0">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-5xl w-full space-y-8 sm:space-y-12 py-8 sm:py-0"
+      >
         {/* Header */}
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
+        <motion.div variants={itemVariants} className="text-center space-y-4 max-w-2xl mx-auto">
           <h1 className="text-3xl sm:text-6xl font-extrabold tracking-tight lg:text-7xl">
             Your Notes, <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
@@ -27,39 +53,30 @@ export default function HomePage() {
           <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
             All the best for your studies! Pick a semester below to get started with curated notes and resources.
           </p>
-        </div>
+        </motion.div>
 
         {/* Semesters */}
-        <section>
+        <motion.section variants={itemVariants}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Locked */}
-            <SemesterCard
-              title="Semester 1"
-              description="Fundamentals & Basics"
-              locked
-            />
-            <SemesterCard
-              title="Semester 2"
-              description="Advanced Concepts"
-              locked
-            />
-            <SemesterCard
-              title="Semester 3"
-              description="Core Specialization"
-              locked
-            />
+            <motion.div variants={itemVariants}>
+              <SemesterCard title="Semester 1" description="Fundamentals & Basics" locked />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <SemesterCard title="Semester 2" description="Advanced Concepts" locked />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <SemesterCard title="Semester 3" description="Core Specialization" locked />
+            </motion.div>
 
             {/* Active */}
-            <Link href="/semester/4" className="group">
-              <SemesterCard
-                title="Semester 4"
-                description="Current Syllabus"
-                active
-              />
-            </Link>
+            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link href="/semester/4" className="group block h-full">
+                <SemesterCard title="Semester 4" description="Current Syllabus" active />
+              </Link>
+            </motion.div>
           </div>
-        </section>
-      </div>
+        </motion.section>
+      </motion.div>
     </main>
   );
 }
@@ -78,10 +95,10 @@ function SemesterCard({
   return (
     <div
       className={`
-        relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 h-full
+        relative overflow-hidden rounded-2xl border p-6 transition-colors duration-300 h-full
         flex flex-col justify-between
         ${active
-          ? "bg-card border-primary/20 shadow-lg shadow-primary/5 hover:shadow-primary/10 hover:border-primary/40 hover:-translate-y-1 group-hover:scale-[1.02]"
+          ? "bg-card border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40"
           : "bg-muted/30 border-transparent opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 cursor-not-allowed"
         }
       `}

@@ -4,10 +4,32 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { motion, Variants } from "framer-motion";
 
 type Subject = {
   subject: number;
   name: string;
+};
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 15 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
 };
 
 export default function Semester4Page() {
@@ -44,31 +66,42 @@ export default function Semester4Page() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+    <main className="max-w-7xl mx-auto px-6 py-10 space-y-10 overflow-hidden">
       {/* Header */}
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Semester <span className="text-primary">4</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-2">
           Select a subject to view notes, question banks, and resources
         </p>
-      </div>
+      </motion.div>
 
       {/* Subject Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
         {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
           <Link
             key={num}
             href={`/semester/4/subject/${num}`}
-            className="group"
+            className="group block h-full"
           >
-            <div
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className="
                 relative h-full rounded-xl border border-border
                 bg-gradient-to-br from-background to-muted/30
-                p-6 transition-all duration-300
-                hover:-translate-y-1
+                p-6 transition-colors duration-300
                 hover:border-primary/50
                 hover:shadow-lg hover:shadow-primary/10
               "
@@ -87,10 +120,10 @@ export default function Semester4Page() {
               <div className="mt-4 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition">
                 Open →
               </div>
-            </div>
+            </motion.div>
           </Link>
         ))}
-      </div>
+      </motion.div>
     </main>
   );
 }

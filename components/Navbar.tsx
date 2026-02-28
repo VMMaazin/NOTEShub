@@ -3,13 +3,21 @@
 import Link from "next/link";
 import { signOut, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { Menu, X, GraduationCap } from "lucide-react"; // Import icons for mobile menu
+import { useTheme } from "next-themes";
+import { Menu, X, GraduationCap, Sun, Moon } from "lucide-react";
 
 export default function Navbar() {
   const { user, name, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleResetPassword() {
     // ... (same logic)
@@ -55,6 +63,16 @@ export default function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3 text-sm font-medium">
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-full border border-border/50 bg-secondary/50 text-secondary-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
+
           {/* Semester link */}
           <Link
             href="/semester/4"
@@ -135,6 +153,19 @@ export default function Navbar() {
             >
               <span className="font-medium">Go to Semester 4</span>
             </Link>
+
+            {mounted && (
+              <button
+                onClick={() => {
+                  setTheme(theme === "dark" ? "light" : "dark");
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-2 px-4 py-3 rounded-md bg-secondary/50 hover:bg-secondary transition-colors text-left"
+              >
+                {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                <span className="font-medium">Toggle Theme</span>
+              </button>
+            )}
 
             <Link
               href="/downloads"

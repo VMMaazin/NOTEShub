@@ -14,6 +14,7 @@ import {
     ChevronRight,
     WifiOff
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Subject = {
     subject: number;
@@ -23,6 +24,21 @@ type Subject = {
 // Grouped structure: Semester -> Files[]
 type FilesBySemester = {
     [semester: number]: Omit<OfflineFile, "blob">[];
+};
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0 },
 };
 
 export default function DownloadsPage() {
@@ -182,11 +198,16 @@ export default function DownloadsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-8 px-4">
+        <div className="min-h-screen bg-background py-8 px-4 overflow-hidden">
             <div className="max-w-5xl mx-auto space-y-8">
 
                 {/* Header & Stats */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+                >
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Downloads</h1>
                         <p className="text-muted-foreground mt-1">
@@ -216,11 +237,15 @@ export default function DownloadsPage() {
                             </div>
                         </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Empty State */}
                 {semesters.length === 0 ? (
-                    <div className="text-center py-20 border-2 border-dashed border-border rounded-xl bg-card/30">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-center py-20 border-2 border-dashed border-border rounded-xl bg-card/30"
+                    >
                         <div className="inline-flex p-4 rounded-full bg-muted text-muted-foreground mb-4">
                             <Download className="w-8 h-8" />
                         </div>
@@ -228,99 +253,115 @@ export default function DownloadsPage() {
                         <p className="text-muted-foreground mt-1 max-w-sm mx-auto">
                             Files you download for offline access will appear here.
                         </p>
-                    </div>
+                    </motion.div>
                 ) : (
                     <div className="space-y-6">
                         {/* Semester Tabs */}
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border">
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border"
+                        >
                             {semesters.map(sem => (
                                 <button
                                     key={sem}
                                     onClick={() => setActiveSemester(sem)}
                                     className={`
-                                px-4 py-2 rounded-t-lg border-b-2 text-sm font-medium transition-colors whitespace-nowrap
-                                ${activeSemester === sem
-                                            ? "border-primary text-primary"
-                                            : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"}
-                            `}
+                                        relative px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap
+                                        ${activeSemester === sem
+                                            ? "text-primary"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-t-lg"}
+                                    `}
                                 >
+                                    {activeSemester === sem && (
+                                        <motion.div
+                                            layoutId="active-semester-tab"
+                                            className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
+                                        />
+                                    )}
                                     {sem === 0 ? "Others" : `Semester ${sem}`}
                                 </button>
                             ))}
-                        </div>
+                        </motion.div>
 
                         {/* Subject Grid */}
-                        <div className="space-y-8">
-                            {allSubjectIds.map(subId => {
-                                const subName = getSubjectName(activeSemester, subId);
-                                const files = currentFilesBySubject[subId] || [];
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeSemester}
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit={{ opacity: 0, y: -10 }}
+                                className="space-y-8"
+                            >
+                                {allSubjectIds.map(subId => {
+                                    const subName = getSubjectName(activeSemester, subId);
+                                    const files = currentFilesBySubject[subId] || [];
 
-                                // If we have subjects defined for this semester but no files, user might want to see the "empty" folder?
-                                // Requirement says: "If none -> show 'No downloads for this subject'" - ONLY if we decide to show the subject card.
-                                // It makes sense to show ALL subjects belonging to the semester, plus any extras that have files.
+                                    return (
+                                        <motion.section variants={itemVariants} key={subId} className="space-y-3">
+                                            <h2 className="text-xl font-semibold flex items-center gap-2">
+                                                <span className="w-1.5 h-6 bg-primary rounded-full" />
+                                                {subName}
+                                                <span className="text-sm font-normal text-muted-foreground ml-2">
+                                                    ({files.length})
+                                                </span>
+                                            </h2>
 
-                                return (
-                                    <section key={subId} className="space-y-3">
-                                        <h2 className="text-xl font-semibold flex items-center gap-2">
-                                            <span className="w-1.5 h-6 bg-primary rounded-full" />
-                                            {subName}
-                                            <span className="text-sm font-normal text-muted-foreground ml-2">
-                                                ({files.length})
-                                            </span>
-                                        </h2>
-
-                                        {files.length === 0 ? (
-                                            <div className="p-8 border border-border border-dashed rounded-xl text-center text-muted-foreground text-sm bg-card/30">
-                                                No downloads for this subject
-                                            </div>
-                                        ) : (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                {files.map(file => (
-                                                    <div
-                                                        key={file.id}
-                                                        className="group relative bg-card border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all flex flex-col gap-3"
-                                                    >
-                                                        <div className="flex items-start justify-between gap-3">
-                                                            <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
-                                                                <FileText className="w-5 h-5" />
-                                                            </div>
-                                                            <div className="flex flex-col items-end gap-1">
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleDelete(file.id); }}
-                                                                    className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition"
-                                                                    title="Delete"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className="font-medium truncate" title={file.name}>
-                                                                {file.name}
-                                                            </h3>
-                                                            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                                                <span>{formatBytes(file.size)}</span>
-                                                                <span>•</span>
-                                                                <span>{new Date(file.downloadedAt).toLocaleDateString()}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        <button
-                                                            onClick={() => handleOpen(file.id)}
-                                                            className="w-full mt-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                                            {files.length === 0 ? (
+                                                <div className="p-8 border border-border border-dashed rounded-xl text-center text-muted-foreground text-sm bg-card/30">
+                                                    No downloads for this subject
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {files.map(file => (
+                                                        <motion.div
+                                                            key={file.id}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            className="group relative bg-card border border-border rounded-xl p-4 transition-all flex flex-col gap-3 shadow-sm hover:shadow-md hover:border-primary/30"
                                                         >
-                                                            <Eye className="w-4 h-4" />
-                                                            Open File
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </section>
-                                );
-                            })}
-                        </div>
+                                                            <div className="flex items-start justify-between gap-3">
+                                                                <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                                                                    <FileText className="w-5 h-5" />
+                                                                </div>
+                                                                <div className="flex flex-col items-end gap-1">
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleDelete(file.id); }}
+                                                                        className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition"
+                                                                        title="Delete"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="font-medium truncate" title={file.name}>
+                                                                    {file.name}
+                                                                </h3>
+                                                                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                                                    <span>{formatBytes(file.size)}</span>
+                                                                    <span>•</span>
+                                                                    <span>{new Date(file.downloadedAt).toLocaleDateString()}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={() => handleOpen(file.id)}
+                                                                className="w-full mt-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                                Open File
+                                                            </button>
+                                                        </motion.div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </motion.section>
+                                    );
+                                })}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 )}
             </div>

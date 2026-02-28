@@ -13,6 +13,20 @@ import { Eye, Download } from "lucide-react";
 // Removed dynamic import of PdfViewer
 import { useAuth } from "@/context/AuthContext";
 import DownloadModal from "./DownloadModal";
+import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
+};
 
 type Props = {
   semester: number;
@@ -165,9 +179,15 @@ export default function FileList({
         </div>
       )}
 
-      <ul className="space-y-3">
+      <motion.ul
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-3"
+      >
         {files.map((file) => (
-          <li
+          <motion.li
+            variants={itemVariants}
             key={file.id}
             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border border-border rounded-md bg-card/50 hover:bg-card/80 transition-colors"
           >
@@ -245,9 +265,9 @@ export default function FileList({
                 )}
               </div>
             )}
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
 
       {/* Download Modal - Pass enriched file object */}
       {downloadingFile && (
