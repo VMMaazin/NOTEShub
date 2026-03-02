@@ -192,7 +192,7 @@ export default function FileList({
           <FileQuestion className="w-6 h-6 text-muted-foreground" />
         </div>
         <h4 className="font-medium text-foreground mb-1">No files yet</h4>
-        <p className="text-sm text-muted-foreground max-w-sm">
+        <p className="text-sm text-muted-foreground max-w-[280px] sm:max-w-sm">
           There are no uploaded documents for this section at the moment.
         </p>
       </motion.div>
@@ -244,17 +244,17 @@ export default function FileList({
                 </button>
               </div>
             ) : (
-              <span className="text-sm truncate font-medium">
+              <div className="text-sm truncate font-medium flex-1 min-w-0">
                 {file.name}
-              </span>
+              </div>
             )}
 
             {editingId !== file.id && (
-              <div className="flex flex-wrap gap-4 text-xs">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 text-xs w-full sm:w-auto mt-2 sm:mt-0">
                 {/* View */}
                 <button
                   onClick={() => openPdf(file)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary hover:bg-primary/10 transition font-medium text-sm group"
+                  className="inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg border border-primary text-primary hover:bg-primary/10 transition font-medium text-sm group w-full sm:w-auto"
                 >
                   <Eye className="w-4 h-4" />
                   View
@@ -263,7 +263,7 @@ export default function FileList({
                 {/* Download Button triggering Modal */}
                 <button
                   onClick={() => setDownloadingFile(file)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium text-sm shadow-sm hover:shadow"
+                  className="inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium text-sm shadow-sm hover:shadow w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4" />
                   Download
@@ -273,14 +273,14 @@ export default function FileList({
                   <>
                     <button
                       onClick={() => startEditing(file)}
-                      className="px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-foreground/50 transition"
+                      className="px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-foreground/50 transition w-full sm:w-auto flex justify-center items-center"
                     >
                       Rename
                     </button>
 
                     <button
                       onClick={() => handleDelete(file)}
-                      className="px-3 py-1.5 rounded-md border border-red-500 text-red-500 hover:bg-red-500/10 transition"
+                      className="px-3 py-1.5 rounded-md border border-red-500 text-red-500 hover:bg-red-500/10 transition w-full sm:w-auto flex justify-center items-center"
                     >
                       Delete
                     </button>

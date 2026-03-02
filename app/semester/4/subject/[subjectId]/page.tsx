@@ -67,7 +67,7 @@ export default function SubjectPage() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10 space-y-8 overflow-hidden">
+    <main className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8 overflow-hidden">
       {/* Back */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -85,7 +85,7 @@ export default function SubjectPage() {
 
       {/* Subject title */}
       <motion.div
-        className="flex items-center gap-3"
+        className="flex items-start sm:items-center gap-3 w-full"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -116,7 +116,7 @@ export default function SubjectPage() {
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words min-w-0 flex-1">
               {subjectName || "Loading…"}
             </h1>
             {isAuthor && (
@@ -134,12 +134,12 @@ export default function SubjectPage() {
 
       {/* MODULES TABS */}
       <motion.div
-        className="flex justify-center mb-10 w-full overflow-x-auto pb-2 scrollbar-none"
+        className="w-full overflow-x-auto pb-2 scrollbar-none mb-8 sm:mb-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <div className="flex bg-secondary/40 p-1.5 rounded-2xl border border-border/20 w-max shadow-inner">
+        <div className="flex bg-secondary/40 p-1.5 rounded-2xl border border-border/20 w-max shadow-inner mx-auto sm:mx-0">
           {[1, 2, 3, 4, 5].map((module) => {
             const isActive = activeModule === module;
             return (
@@ -147,8 +147,8 @@ export default function SubjectPage() {
                 key={module}
                 onClick={() => setActiveModule(module)}
                 className={`relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   }`}
               >
                 {isActive && (
@@ -182,7 +182,7 @@ export default function SubjectPage() {
                 <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
                   <Book className="w-5 h-5" />
                 </div>
-                <h2 className="text-2xl font-bold">Notes</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">Notes</h2>
               </div>
               {isAuthor && (
                 <UploadFile
@@ -208,7 +208,7 @@ export default function SubjectPage() {
                 <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
                   <ShieldQuestion className="w-5 h-5" />
                 </div>
-                <h2 className="text-2xl font-bold">Question Banks</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">Question Banks</h2>
               </div>
               {isAuthor && (
                 <UploadFile
@@ -234,7 +234,7 @@ export default function SubjectPage() {
                 <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h2 className="text-2xl font-bold">Extra Resources</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">Extra Resources</h2>
               </div>
               {isAuthor && (
                 <UploadFile
