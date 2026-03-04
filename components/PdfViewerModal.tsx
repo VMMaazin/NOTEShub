@@ -5,7 +5,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { X, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 
 // Import styles
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -73,32 +73,19 @@ export default function PdfViewerModal({
                     {/* PDF Viewer Content */}
                     <div className="flex-1 overflow-hidden bg-[#e4e4e4] dark:bg-neutral-900 relative">
                         <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
-                            <TransformWrapper
-                                initialScale={1}
-                                minScale={1}
-                                maxScale={5}
-                                centerOnInit
-                                wheel={{ step: 0.1, activationKeys: ["Control"] }}
-                            >
-                                <TransformComponent
-                                    wrapperStyle={{ width: "100%", height: "100%" }}
-                                    contentStyle={{ width: "100%", height: "100%" }}
-                                >
-                                    <div className="h-full w-full custom-pdf-viewer">
-                                        {fileUrl ? (
-                                            <Viewer
-                                                fileUrl={fileUrl}
-                                                plugins={[defaultLayoutPluginInstance]}
-                                                theme="auto"
-                                            />
-                                        ) : (
-                                            <div className="flex items-center justify-center h-full text-muted-foreground">
-                                                Failed to load PDF URL.
-                                            </div>
-                                        )}
+                            <div className="h-full w-full custom-pdf-viewer">
+                                {fileUrl ? (
+                                    <Viewer
+                                        fileUrl={fileUrl}
+                                        plugins={[defaultLayoutPluginInstance]}
+                                        theme="auto"
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                                        Failed to load PDF URL.
                                     </div>
-                                </TransformComponent>
-                            </TransformWrapper>
+                                )}
+                            </div>
                         </Worker>
                     </div>
                 </motion.div>
