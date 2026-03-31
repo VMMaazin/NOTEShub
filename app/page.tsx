@@ -58,6 +58,13 @@ export default function HomePage() {
         {/* Semesters */}
         <motion.section variants={itemVariants}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Active */}
+            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link href="/semester/4" className="group block h-full">
+                <SemesterCard title="Semester 4" description="Current Syllabus" active />
+              </Link>
+            </motion.div>
+
             <motion.div variants={itemVariants}>
               <SemesterCard title="Semester 1" description="Fundamentals & Basics" locked />
             </motion.div>
@@ -66,13 +73,6 @@ export default function HomePage() {
             </motion.div>
             <motion.div variants={itemVariants}>
               <SemesterCard title="Semester 3" description="Core Specialization" locked />
-            </motion.div>
-
-            {/* Active */}
-            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/semester/4" className="group block h-full">
-                <SemesterCard title="Semester 4" description="Current Syllabus" active />
-              </Link>
             </motion.div>
           </div>
         </motion.section>

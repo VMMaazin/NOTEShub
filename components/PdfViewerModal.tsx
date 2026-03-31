@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import { X, ExternalLink } from "lucide-react";
+import { X, ExternalLink, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 
@@ -24,7 +24,9 @@ export default function PdfViewerModal({
     fileUrl,
     fileName,
 }: PdfViewerModalProps) {
-    const defaultLayoutPluginInstance = defaultLayoutPlugin();
+    const defaultLayoutPluginInstance = defaultLayoutPlugin({
+        setInitialTab: () => Promise.resolve(-1),
+    });
 
     if (!isOpen) return null;
 
@@ -51,6 +53,17 @@ export default function PdfViewerModal({
                         <div className="flex items-center gap-2">
                             <a
                                 href={fileUrl}
+                                download={fileName}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors flex items-center gap-2 text-sm font-medium"
+                                title="Download PDF"
+                            >
+                                <Download className="w-4 h-4" />
+                                <span className="hidden sm:inline">Download</span>
+                            </a>
+                            <a
+                                href={fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors flex items-center gap-2 text-sm font-medium"
@@ -71,7 +84,7 @@ export default function PdfViewerModal({
                     </div>
 
                     {/* PDF Viewer Content */}
-                    <div className="flex-1 overflow-hidden bg-[#e4e4e4] dark:bg-neutral-900 relative">
+                    <div className="flex-1 overflow-hidden bg-zinc-100 dark:bg-zinc-900 py-2 sm:py-4 px-2 sm:px-6 relative">
                         <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
                             <div className="h-full w-full custom-pdf-viewer">
                                 {fileUrl ? (
@@ -79,6 +92,7 @@ export default function PdfViewerModal({
                                         fileUrl={fileUrl}
                                         plugins={[defaultLayoutPluginInstance]}
                                         theme="auto"
+                                        defaultScale={1}
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-muted-foreground">
