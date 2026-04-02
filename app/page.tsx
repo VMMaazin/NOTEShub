@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
+import HomeSearch from "@/components/HomeSearch";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -26,15 +27,40 @@ const itemVariants: Variants = {
 export default function HomePage() {
   return (
     <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Decor */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
-      >
-        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[200px] w-[200px] sm:h-[310px] sm:w-[310px] rounded-full bg-primary/20 opacity-20 blur-[80px] sm:blur-[100px]"></div>
-      </motion.div>
+      {/* Dynamic Animated Background */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background overflow-hidden pointer-events-none">
+        {/* Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+
+        {/* Floating Orbs */}
+        <motion.div
+          animate={{
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-primary/40 dark:bg-primary/30 blur-[80px] sm:blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-60"
+        />
+        <motion.div
+          animate={{
+            x: [0, -80, 0],
+            y: [0, -100, 0],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] max-w-[500px] max-h-[500px] rounded-full bg-violet-400/50 dark:bg-violet-600/30 blur-[80px] sm:blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-40 dark:opacity-50"
+        />
+        <motion.div
+          animate={{
+            x: [0, 50, 0],
+            y: [0, 100, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-[-20%] left-[20%] w-[45vw] h-[45vw] max-w-[700px] max-h-[700px] rounded-full bg-cyan-400/50 dark:bg-cyan-500/30 blur-[80px] sm:blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-40 dark:opacity-50"
+        />
+      </div>
 
       <motion.div
         variants={containerVariants}
@@ -55,9 +81,14 @@ export default function HomePage() {
           </p>
         </motion.div>
 
+        {/* Search */}
+        <motion.div variants={itemVariants} className="w-full relative z-30">
+          <HomeSearch />
+        </motion.div>
+
         {/* Semesters */}
-        <motion.section variants={itemVariants}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.section variants={itemVariants} className="pt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {/* Active */}
             <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/semester/4" className="group block h-full">
