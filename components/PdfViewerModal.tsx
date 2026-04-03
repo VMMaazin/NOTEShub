@@ -25,7 +25,7 @@ export default function PdfViewerModal({
     fileName,
 }: PdfViewerModalProps) {
     const defaultLayoutPluginInstance = defaultLayoutPlugin({
-        setInitialTab: () => Promise.resolve(-1),
+        sidebarTabs: () => [],
     });
 
     if (!isOpen) return null;
