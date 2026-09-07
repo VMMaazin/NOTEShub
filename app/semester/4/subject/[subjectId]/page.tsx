@@ -67,7 +67,7 @@ export default function SubjectPage() {
   }
 
   return (
-    <main className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8 overflow-hidden">
+    <main className="w-full min-w-0 max-w-[1700px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Back */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -132,40 +132,37 @@ export default function SubjectPage() {
         )}
       </motion.div>
 
-      {/* MODULES TABS */}
+      {/* MODULES TABS (Neumorphic tactile control) */}
       <motion.div
         className="w-full overflow-x-auto pb-2 scrollbar-none mb-8 sm:mb-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <div className="flex bg-secondary/40 p-1.5 rounded-2xl border border-border/20 w-max shadow-inner mx-auto sm:mx-0">
+        <div className="flex bg-secondary/50 p-2 rounded-2xl border border-border/40 w-max neu-track mx-auto sm:mx-0 gap-2">
           {[1, 2, 3, 4, 5].map((module) => {
             const isActive = activeModule === module;
             return (
               <button
                 key={module}
                 onClick={() => setActiveModule(module)}
-                className={`relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${isActive
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                  }`}
+                className={`relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  isActive
+                    ? "neu-pressed bg-background text-primary shadow-inner border border-border/50"
+                    : "text-muted-foreground hover:text-foreground hover:neu-flat hover:bg-secondary/70"
+                }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="active-tab"
-                    className="absolute inset-0 bg-background rounded-xl shadow-sm border border-border/50"
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  />
-                )}
-                <span className="relative z-10">Module {module}</span>
+                <span className="relative z-10 flex items-center gap-2">
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                  Module {module}
+                </span>
               </button>
             );
           })}
         </div>
       </motion.div>
 
-      {/* ACTIVE MODULE CONTENT */}
+      {/* ACTIVE MODULE CONTENT (Glassmorphic sections) */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeModule}
@@ -173,16 +170,19 @@ export default function SubjectPage() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="space-y-12"
+          className="space-y-8"
         >
           {/* NOTES */}
-          <section>
+          <section className="glass-card rounded-3xl p-6 sm:p-8 border border-border/70 shadow-sm relative overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
+                <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
                   <Book className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold">Notes</h2>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold">Notes</h2>
+                  <p className="text-xs text-muted-foreground">Comprehensive module notes & lectures</p>
+                </div>
               </div>
               {isAuthor && (
                 <UploadFile
@@ -202,13 +202,16 @@ export default function SubjectPage() {
           </section>
 
           {/* QUESTION BANK */}
-          <section>
+          <section className="glass-card rounded-3xl p-6 sm:p-8 border border-border/70 shadow-sm relative overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
                   <ShieldQuestion className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold">Question Banks</h2>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold">Question Banks</h2>
+                  <p className="text-xs text-muted-foreground">Previous exam questions & model papers</p>
+                </div>
               </div>
               {isAuthor && (
                 <UploadFile
@@ -228,13 +231,16 @@ export default function SubjectPage() {
           </section>
 
           {/* EXTRA */}
-          <section>
+          <section className="glass-card rounded-3xl p-6 sm:p-8 border border-border/70 shadow-sm relative overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500">
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold">Extra Resources</h2>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold">Extra Resources</h2>
+                  <p className="text-xs text-muted-foreground">Reference documents & syllabus links</p>
+                </div>
               </div>
               {isAuthor && (
                 <UploadFile

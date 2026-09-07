@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Download, Smartphone, CheckCircle, AlertCircle } from "lucide-react";
 import { saveFile } from "@/lib/db";
 
@@ -22,12 +23,26 @@ type Props = {
 };
 
 export default function DownloadModal({ file, isOpen, onClose }: Props) {
+    const [mounted, setMounted] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen, onClose]);
+
+    if (!isOpen || !mounted) return null;
 
     // Option 1: Download to Device
     const handleDeviceDownload = () => {
@@ -62,8 +77,10 @@ export default function DownloadModal({ file, isOpen, onClose }: Props) {
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
+
                 chunks.push(value);
                 loaded += value.length;
+
                 if (total) {
                     setProgress(Math.round((loaded / total) * 100));
                 }
@@ -71,32 +88,31 @@ export default function DownloadModal({ file, isOpen, onClose }: Props) {
 
             const blob = new Blob(chunks, { type: response.headers.get("Content-Type") || "application/pdf" });
 
+            // Extract metadata if available
             await saveFile({
                 id: file.id,
                 name: file.name,
+                blob: blob,
                 subject: file.subject || 0,
                 semester: file.semester || 0,
                 module: file.module || 0,
                 type: file.type || "unknown",
-                blob: blob,
                 size: blob.size,
                 downloadedAt: Date.now(),
-                mimeType: blob.type,
-                remoteUrl: file.url
+                mimeType: file.mimeType || blob.type || "application/pdf",
+                remoteUrl: file.url,
             });
 
             setSuccess(true);
             setTimeout(() => {
                 onClose();
                 setSuccess(false);
-                setDownloading(false);
             }, 1500);
-
         } catch (err: any) {
-            console.error("Download failed:", err);
-            // specific quota error handling could go here
-            if (err.name === 'QuotaExceededError') {
-                setError("Storage quota exceeded. Please delete some files.");
+            console.error("Download failed", err);
+            // Fallback: If CORS or fetch fails, save basic info and instruct
+            if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
+                setError("Network error. Please try 'Download to Device' instead.");
             } else {
                 setError("Download failed. Please try again.");
             }
@@ -104,9 +120,9 @@ export default function DownloadModal({ file, isOpen, onClose }: Props) {
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-card w-full max-w-md rounded-xl border border-border shadow-xl overflow-hidden">
+    return createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
                     <h3 className="font-semibold text-lg">Download Options</h3>
@@ -177,6 +193,7 @@ export default function DownloadModal({ file, isOpen, onClose }: Props) {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

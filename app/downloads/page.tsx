@@ -198,23 +198,23 @@ export default function DownloadsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-8 px-4 overflow-hidden">
-            <div className="max-w-5xl mx-auto space-y-8">
+        <div className="min-h-screen bg-background py-8 sm:py-12 px-6 sm:px-10 lg:px-12 xl:px-16 overflow-hidden">
+            <div className="max-w-[1500px] mx-auto space-y-10">
 
                 {/* Header & Stats */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-8"
                 >
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Downloads</h1>
-                        <p className="text-muted-foreground mt-1">
-                            Your offline library
+                        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Downloads</h1>
+                        <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                            Your offline library stored directly in local browser storage
                         </p>
                         {error && (
-                            <div className="flex items-center gap-2 mt-2 text-sm text-yellow-600 bg-yellow-500/10 px-3 py-1 rounded-md w-fit">
+                            <div className="flex items-center gap-2 mt-3 text-sm text-yellow-600 bg-yellow-500/10 px-3 py-1 rounded-md w-fit border border-yellow-500/20">
                                 <WifiOff className="w-4 h-4" />
                                 {error}
                             </div>
@@ -222,18 +222,32 @@ export default function DownloadsPage() {
                     </div>
 
                     {quota && (
-                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 shadow-sm min-w-[240px]">
-                            <div className="p-2 bg-primary/10 rounded-full text-primary">
-                                <HardDrive className="w-5 h-5" />
+                        <div className="glass-card rounded-2xl p-5 flex flex-col gap-3 min-w-[280px] sm:min-w-[320px] border border-border/70 shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary neu-flat border border-primary/20">
+                                        <HardDrive className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                            Local Storage
+                                        </div>
+                                        <div className="text-sm font-bold text-foreground">
+                                            {formatBytes(quota.usage)} <span className="text-xs font-normal text-muted-foreground">/ {formatBytes(quota.quota)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/15 text-primary border border-primary/20">
+                                    {Math.round(quota.percentage)}%
+                                </span>
                             </div>
-                            <div className="flex-1">
-                                <div className="flex justify-between text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
-                                    <span>Storage</span>
-                                    <span>{Math.round(quota.percentage)}%</span>
-                                </div>
-                                <div className="text-sm font-semibold">
-                                    {formatBytes(quota.usage)} / {formatBytes(quota.quota)}
-                                </div>
+
+                            {/* Recessed Neumorphic Progress Track */}
+                            <div className="w-full h-2 rounded-full bg-secondary neu-track overflow-hidden p-0.5 border border-border/40">
+                                <div
+                                    className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 shadow-sm transition-all duration-500"
+                                    style={{ width: `${Math.min(100, Math.max(2, quota.percentage))}%` }}
+                                />
                             </div>
                         </div>
                     )}
@@ -244,41 +258,35 @@ export default function DownloadsPage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="text-center py-20 border-2 border-dashed border-border rounded-xl bg-card/30"
+                        className="text-center py-24 border-2 border-dashed border-border rounded-3xl bg-card/30 glass-card"
                     >
-                        <div className="inline-flex p-4 rounded-full bg-muted text-muted-foreground mb-4">
+                        <div className="inline-flex p-4 rounded-2xl bg-muted text-muted-foreground mb-4 neu-flat">
                             <Download className="w-8 h-8" />
                         </div>
-                        <h3 className="text-lg font-medium">No downloads yet</h3>
-                        <p className="text-muted-foreground mt-1 max-w-sm mx-auto">
-                            Files you download for offline access will appear here.
+                        <h3 className="text-xl font-bold">No downloads yet</h3>
+                        <p className="text-muted-foreground mt-2 max-w-sm mx-auto text-sm">
+                            Documents you download for offline study will appear here and load without an internet connection.
                         </p>
                     </motion.div>
                 ) : (
-                    <div className="space-y-6">
-                        {/* Semester Tabs */}
+                    <div className="space-y-8">
+                        {/* Semester Tabs (Neumorphic Switcher) */}
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="flex gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border"
+                            className="flex gap-2 overflow-x-auto pb-2 scrollbar-none neu-track bg-secondary/50 p-2 rounded-2xl border border-border/40 w-max"
                         >
                             {semesters.map(sem => (
                                 <button
                                     key={sem}
                                     onClick={() => setActiveSemester(sem)}
                                     className={`
-                                        relative px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap
+                                        relative px-5 py-2 text-sm font-semibold rounded-xl transition-all whitespace-nowrap
                                         ${activeSemester === sem
-                                            ? "text-primary"
-                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-t-lg"}
+                                            ? "neu-pressed bg-background text-primary shadow-inner border border-border/50"
+                                            : "text-muted-foreground hover:text-foreground hover:neu-flat hover:bg-secondary/70"}
                                     `}
                                 >
-                                    {activeSemester === sem && (
-                                        <motion.div
-                                            layoutId="active-semester-tab"
-                                            className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
-                                        />
-                                    )}
                                     {sem === 0 ? "Others" : `Semester ${sem}`}
                                 </button>
                             ))}
@@ -292,55 +300,53 @@ export default function DownloadsPage() {
                                 initial="hidden"
                                 animate="visible"
                                 exit={{ opacity: 0, y: -10 }}
-                                className="space-y-8"
+                                className="space-y-10"
                             >
                                 {allSubjectIds.map(subId => {
                                     const subName = getSubjectName(activeSemester, subId);
                                     const files = currentFilesBySubject[subId] || [];
 
                                     return (
-                                        <motion.section variants={itemVariants} key={subId} className="space-y-3">
-                                            <h2 className="text-xl font-semibold flex items-center gap-2">
+                                        <motion.section variants={itemVariants} key={subId} className="space-y-4">
+                                            <h2 className="text-xl font-bold flex items-center gap-2.5">
                                                 <span className="w-1.5 h-6 bg-primary rounded-full" />
                                                 {subName}
-                                                <span className="text-sm font-normal text-muted-foreground ml-2">
-                                                    ({files.length})
+                                                <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-secondary text-muted-foreground border border-border/50 ml-1">
+                                                    {files.length} {files.length === 1 ? "file" : "files"}
                                                 </span>
                                             </h2>
 
                                             {files.length === 0 ? (
-                                                <div className="p-8 border border-border border-dashed rounded-xl text-center text-muted-foreground text-sm bg-card/30">
-                                                    No downloads for this subject
+                                                <div className="p-8 border border-border/60 border-dashed rounded-2xl text-center text-muted-foreground text-sm bg-card/20">
+                                                    No offline downloads saved for this subject yet.
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                                                     {files.map(file => (
                                                         <motion.div
                                                             key={file.id}
-                                                            whileHover={{ scale: 1.02 }}
-                                                            className="group relative bg-card border border-border rounded-xl p-4 transition-all flex flex-col gap-3 shadow-sm hover:shadow-md hover:border-primary/30"
+                                                            whileHover={{ y: -3 }}
+                                                            className="group relative glass-card rounded-2xl p-5 transition-all flex flex-col justify-between gap-4 border border-border/70 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5"
                                                         >
                                                             <div className="flex items-start justify-between gap-3">
-                                                                <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                                                                <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0 border border-primary/20">
                                                                     <FileText className="w-5 h-5" />
                                                                 </div>
-                                                                <div className="flex flex-col items-end gap-1">
-                                                                    <button
-                                                                        onClick={(e) => { e.stopPropagation(); handleDelete(file.id); }}
-                                                                        className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition"
-                                                                        title="Delete"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                    </button>
-                                                                </div>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleDelete(file.id); }}
+                                                                    className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition border border-transparent hover:border-red-500/20"
+                                                                    title="Delete offline file"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
                                                             </div>
 
                                                             <div className="flex-1 min-w-0">
-                                                                <h3 className="font-medium truncate" title={file.name}>
+                                                                <h3 className="font-semibold text-foreground truncate" title={file.name}>
                                                                     {file.name}
                                                                 </h3>
-                                                                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                                                    <span>{formatBytes(file.size)}</span>
+                                                                <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                                                                    <span className="font-medium text-foreground/80">{formatBytes(file.size)}</span>
                                                                     <span>•</span>
                                                                     <span>{new Date(file.downloadedAt).toLocaleDateString()}</span>
                                                                 </div>
@@ -348,10 +354,10 @@ export default function DownloadsPage() {
 
                                                             <button
                                                                 onClick={() => handleOpen(file.id)}
-                                                                className="w-full mt-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                                                                className="w-full mt-1 py-2.5 rounded-xl bg-secondary/90 text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-200 text-xs font-semibold flex items-center justify-center gap-2 border border-border/60 hover:border-primary shadow-sm"
                                                             >
                                                                 <Eye className="w-4 h-4" />
-                                                                Open File
+                                                                Open Document
                                                             </button>
                                                         </motion.div>
                                                     ))}

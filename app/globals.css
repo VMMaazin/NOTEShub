@@ -37,6 +37,10 @@
     --ring: 240 5.9% 10%;
 
     --radius: 0.75rem;
+
+    /* Neumorphic shadow tokens - Light */
+    --neu-shadow-dark: rgba(0, 0, 0, 0.08);
+    --neu-shadow-light: rgba(255, 255, 255, 0.9);
   }
 
   .dark {
@@ -67,6 +71,10 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+
+    /* Neumorphic shadow tokens - Dark */
+    --neu-shadow-dark: rgba(0, 0, 0, 0.55);
+    --neu-shadow-light: rgba(255, 255, 255, 0.04);
   }
 }
 
@@ -77,6 +85,7 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
@@ -85,6 +94,58 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ====================================
+   Glassmorphic & Neumorphic Design Tokens
+   ==================================== */
+
+@layer utilities {
+  /* Glassmorphism */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .dark .glass-card {
+    background: rgba(18, 18, 23, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .dark .glass-panel {
+    background: rgba(12, 12, 16, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Neumorphism (Soft UI tactile controls) */
+  .neu-flat {
+    box-shadow: 4px 4px 10px var(--neu-shadow-dark), -3px -3px 8px var(--neu-shadow-light);
+  }
+
+  .neu-pressed {
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  }
+
+  .neu-convex {
+    box-shadow: 3px 3px 8px var(--neu-shadow-dark), -2px -2px 6px var(--neu-shadow-light);
+  }
+
+  .neu-track {
+    box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -1px -1px 3px var(--neu-shadow-light);
   }
 }
 
@@ -101,4 +162,14 @@
 .react-pdf__Page__canvas {
   max-width: 100%;
   height: auto !important;
+}
+
+/* Mobile PDF Viewer Toolbar */
+.custom-pdf-viewer .rpv-default-layout__toolbar {
+  overflow-x: auto !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.custom-pdf-viewer .rpv-default-layout__toolbar::-webkit-scrollbar {
+  display: none;
 }

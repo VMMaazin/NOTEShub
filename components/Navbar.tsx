@@ -39,14 +39,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/75 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="w-full max-w-[1700px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 h-16 flex items-center justify-between">
         {/* Left: Brand */}
         <Link
           href="/"
           className="flex items-center gap-2.5 hover:opacity-90 transition-opacity group"
         >
-          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
             <GraduationCap className="h-5 w-5" />
           </div>
           <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
@@ -56,7 +56,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 rounded-md hover:bg-accent hover:text-accent-foreground"
+          className="md:hidden p-2 rounded-lg hover:bg-accent hover:text-accent-foreground"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -67,29 +67,28 @@ export default function Navbar() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full border border-border/50 bg-secondary/50 text-secondary-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              className="p-2 rounded-full border border-border/50 bg-secondary/50 text-secondary-foreground hover:bg-secondary hover:text-foreground transition-all active:scale-95 neu-convex"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           )}
 
-          {/* Semester link */}
+          {/* Semester links */}
           <Link
-            href="/semester/4"
-            className="flex items-center px-4 py-2 rounded-full border border-border/50
-                       bg-secondary/50 text-secondary-foreground
-                       hover:bg-secondary hover:text-foreground
-                       transition-colors"
+            href="/semester/5"
+            className="flex items-center px-4 py-2 rounded-full border border-primary/30
+                       bg-primary/10 text-primary font-semibold text-xs
+                       hover:bg-primary/20 transition-all shadow-sm shadow-primary/5"
           >
-            Semester 4
+            Semester 5
           </Link>
 
           {/* Downloads link */}
           <Link
             href="/downloads"
             className="flex items-center px-4 py-2 rounded-full border border-border/50
-                       bg-secondary/50 text-secondary-foreground
+                       bg-secondary/50 text-secondary-foreground text-xs font-medium
                        hover:bg-secondary hover:text-foreground
                        transition-colors"
           >
@@ -148,12 +147,13 @@ export default function Navbar() {
         <div className="md:hidden border-t border-border/40 bg-background">
           <div className="px-6 py-4 space-y-4 flex flex-col">
             <Link
-              href="/semester/4"
+              href="/semester/5"
               className="flex items-center gap-2 px-4 py-3 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              <span className="font-medium">Go to Semester 4</span>
+              <span className="font-medium">Go to Semester 5</span>
             </Link>
+
 
             {mounted && (
               <button

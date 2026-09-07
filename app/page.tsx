@@ -66,7 +66,7 @@ export default function HomePage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-5xl w-full space-y-8 sm:space-y-12 py-8 sm:py-0"
+        className="max-w-7xl w-full space-y-8 sm:space-y-12 py-8 sm:py-0"
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center space-y-4 max-w-2xl mx-auto">
@@ -88,22 +88,40 @@ export default function HomePage() {
 
         {/* Semesters */}
         <motion.section variants={itemVariants} className="pt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-            {/* Active */}
-            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/semester/4" className="group block h-full">
-                <SemesterCard title="Semester 4" description="Current Syllabus" active />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 relative z-10">
+            {/* Semester 5 - Featured / Pop Out */}
+            <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link href="/semester/5" className="group block h-full focus:outline-none">
+                <SemesterCard
+                  title="Semester 5"
+                  description="Current Syllabus"
+                  variant="featured"
+                  statusText="Current"
+                />
               </Link>
             </motion.div>
 
+            {/* Semester 4 - Subtle / Available */}
+            <motion.div variants={itemVariants} whileHover={{ y: -2, scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+              <Link href="/semester/4" className="group block h-full focus:outline-none">
+                <SemesterCard
+                  title="Semester 4"
+                  description="Previous Syllabus"
+                  variant="available"
+                  statusText="Available"
+                />
+              </Link>
+            </motion.div>
+
+            {/* Locked Semesters */}
             <motion.div variants={itemVariants}>
-              <SemesterCard title="Semester 1" description="Fundamentals & Basics" locked />
+              <SemesterCard title="Semester 1" description="Fundamentals & Basics" variant="locked" />
             </motion.div>
             <motion.div variants={itemVariants}>
-              <SemesterCard title="Semester 2" description="Advanced Concepts" locked />
+              <SemesterCard title="Semester 2" description="Advanced Concepts" variant="locked" />
             </motion.div>
             <motion.div variants={itemVariants}>
-              <SemesterCard title="Semester 3" description="Core Specialization" locked />
+              <SemesterCard title="Semester 3" description="Core Specialization" variant="locked" />
             </motion.div>
           </div>
         </motion.section>
@@ -115,31 +133,32 @@ export default function HomePage() {
 function SemesterCard({
   title,
   description,
-  locked,
+  variant,
+  statusText,
   active,
+  locked,
 }: {
   title: string;
   description?: string;
-  locked?: boolean;
+  variant?: "featured" | "available" | "locked";
+  statusText?: string;
   active?: boolean;
+  locked?: boolean;
 }) {
-  return (
-    <div
-      className={`
-        relative overflow-hidden rounded-2xl border p-6 transition-colors duration-300 h-full
-        flex flex-col justify-between
-        ${active
-          ? "bg-card border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40"
-          : "bg-muted/30 border-transparent opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 cursor-not-allowed"
-        }
-      `}
-    >
-      {active && (
-        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+  const mode = variant || (locked ? "locked" : active ? "featured" : "locked");
+
+  if (mode === "featured") {
+    return (
+      <div className="relative overflow-hidden rounded-2xl border-2 border-primary/50 bg-gradient-to-b from-card via-card to-primary/5 p-6 transition-all duration-300 h-full flex flex-col justify-between shadow-xl shadow-primary/10 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary group">
+        {/* Glowing top line */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400" />
+
+        {/* Background watermark */}
+        <div className="absolute top-0 right-0 p-3 opacity-15 group-hover:opacity-25 transition-opacity pointer-events-none">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="100"
-            height="100"
+            width="90"
+            height="90"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -151,47 +170,104 @@ function SemesterCard({
             <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
           </svg>
         </div>
-      )}
 
-      <div className="space-y-2 relative z-10">
-        <div className="flex items-center justify-between">
-          <h3 className={`font-bold text-xl ${active ? "text-foreground" : "text-muted-foreground"}`}>
+        <div className="space-y-2 relative z-10">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary/15 text-primary border border-primary/30">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+              {statusText || "Current"}
+            </span>
+          </div>
+
+          <h3 className="font-extrabold text-2xl text-foreground tracking-tight pt-1 group-hover:text-primary transition-colors">
             {title}
           </h3>
-          {locked && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-muted-foreground"
-            >
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          )}
-          {active && (
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+
+          {description && (
+            <p className="text-sm text-muted-foreground font-medium">
+              {description}
+            </p>
           )}
         </div>
 
-        {description && (
-          <p className="text-sm text-muted-foreground font-medium">
-            {description}
-          </p>
-        )}
+        <div className="mt-6 pt-4 border-t border-border/60 flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-primary">
+            View Notes
+          </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-primary transform transition-transform group-hover:translate-x-1"
+          >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </div>
       </div>
+    );
+  }
 
-      <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
-        <span className={`text-xs font-semibold uppercase tracking-wider ${active ? "text-primary" : "text-muted-foreground"}`}>
-          {locked ? "Locked" : "View Notes"}
-        </span>
-        {active && (
+  if (mode === "available") {
+    return (
+      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/40 p-6 transition-all duration-300 h-full flex flex-col justify-between hover:border-border hover:bg-card/70 group">
+        <div className="space-y-2 relative z-10">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium text-muted-foreground bg-secondary/70 border border-border/50">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/70" />
+              {statusText || "Available"}
+            </span>
+          </div>
+
+          <h3 className="font-semibold text-lg text-foreground/80 pt-1 group-hover:text-foreground transition-colors">
+            {title}
+          </h3>
+
+          {description && (
+            <p className="text-xs text-muted-foreground font-normal">
+              {description}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+            View Notes
+          </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-muted-foreground group-hover:text-foreground transform transition-transform group-hover:translate-x-1"
+          >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
+  // mode === "locked"
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-border/30 bg-muted/20 p-6 transition-colors duration-300 h-full flex flex-col justify-between opacity-50 cursor-not-allowed">
+      <div className="space-y-2 relative z-10">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-medium text-muted-foreground/80 uppercase tracking-wider">
+            Archived
+          </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -202,12 +278,28 @@ function SemesterCard({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="transform transition-transform group-hover:translate-x-1"
+            className="text-muted-foreground/70"
           >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
+        </div>
+
+        <h3 className="font-semibold text-lg text-muted-foreground pt-1">
+          {title}
+        </h3>
+
+        {description && (
+          <p className="text-xs text-muted-foreground/70">
+            {description}
+          </p>
         )}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-border/30 flex items-center justify-between">
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+          Locked
+        </span>
       </div>
     </div>
   );

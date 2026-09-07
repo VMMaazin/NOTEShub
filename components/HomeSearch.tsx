@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Search, FileText, Book, ShieldQuestion, Download, Eye, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import DownloadModal from "@/components/DownloadModal";
 
 type Subject = {
+  semester: number;
   subject: number;
   name: string;
 };
@@ -54,10 +54,14 @@ export default function HomeSearch() {
         getDocs(collection(db, "subjects")),
         getDocs(collection(db, "files"))
       ]).then(([subjectsSnap, filesSnap]) => {
-        const subjectsList: Subject[] = subjectsSnap.docs.map((d) => ({
-          subject: d.data().subject,
-          name: d.data().name
-        }));
+        const subjectsList: Subject[] = subjectsSnap.docs.map((d) => {
+          const data = d.data();
+          return {
+            semester: Number(data.semester),
+            subject: Number(data.subject),
+            name: data.name || `Subject ${data.subject}`,
+          };
+        });
         setSubjects(subjectsList);
 
         const filesList: FileItem[] = filesSnap.docs.map((d) => {
@@ -67,9 +71,9 @@ export default function HomeSearch() {
             name: data.name,
             url: data.url,
             publicId: data.publicId,
-            semester: data.semester,
-            subject: data.subject,
-            module: data.module,
+            semester: Number(data.semester),
+            subject: Number(data.subject),
+            module: Number(data.module),
             type: data.type
           };
         });
@@ -87,17 +91,21 @@ export default function HomeSearch() {
     const lowerQuery = query.toLowerCase();
     
     // Split the query into terms. 
-    // Examples: "wt mod 2", "web technology module 1 notes", "os 3"
+    // Examples: "wt mod 2", "web technology module 1 notes", "os 3", "sem 5 test"
     const terms = lowerQuery.split(/\s+/).filter(Boolean);
 
     return files.filter((file) => {
-      const subject = subjects.find((s) => s.subject === file.subject);
+      // Correctly match both subject id AND semester!
+      const subject = subjects.find(
+        (s) => s.subject === file.subject && s.semester === file.semester
+      );
       const subjectName = subject?.name.toLowerCase() || "";
       const subjectAcronym = subject ? getAcronym(subject.name) : "";
       
       const fileName = file.name.toLowerCase();
       const typeStr = file.type.toLowerCase();
       const moduleStr = `module ${file.module} mod ${file.module} ${file.module}`;
+      const semStr = `semester ${file.semester} sem ${file.semester} s${file.semester}`;
 
       // Check if ALL terms are present in at least ONE of the file's text properties
       return terms.every((term) => {
@@ -106,7 +114,8 @@ export default function HomeSearch() {
           subjectName.includes(term) ||
           subjectAcronym.includes(term) ||
           typeStr.includes(term) ||
-          moduleStr.includes(term)
+          moduleStr.includes(term) ||
+          semStr.includes(term)
         );
       });
     });
@@ -133,14 +142,14 @@ export default function HomeSearch() {
 
   return (
     <div className="w-full max-w-3xl mx-auto z-20 relative">
-      <div className="relative flex items-center w-full h-14 rounded-2xl bg-card border border-border/50 shadow-xl shadow-primary/5 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all overflow-hidden group">
+      <div className="relative flex items-center w-full h-14 rounded-2xl glass-panel border border-border/60 shadow-2xl shadow-primary/5 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all overflow-hidden group">
         <div className="grid place-items-center h-full w-14 text-muted-foreground group-focus-within:text-primary transition-colors">
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
         </div>
         <input
           className="peer h-full w-full outline-none text-base bg-transparent pr-4 placeholder:text-muted-foreground text-foreground"
           type="text"
-          placeholder="Search for notes... (e.g. 'WT module 2')"
+          placeholder="Search for notes... (e.g. 'WT module 2', 'Sem 5')"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -152,7 +161,7 @@ export default function HomeSearch() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
-            className="absolute top-16 left-0 right-0 max-h-[60vh] overflow-y-auto bg-card border border-border shadow-2xl rounded-2xl p-2 z-50 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+            className="absolute top-16 left-0 right-0 max-h-[60vh] overflow-y-auto glass-panel border border-border shadow-2xl rounded-2xl p-2.5 z-50 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
           >
             {loading && results.length === 0 ? (
                <div className="p-8 text-center text-muted-foreground flex flex-col items-center gap-3">
@@ -162,7 +171,11 @@ export default function HomeSearch() {
             ) : results.length > 0 ? (
               <ul className="space-y-1">
                 {results.map((file) => {
-                  const subject = subjects.find((s) => s.subject === file.subject);
+                  // Precise matching by both subject and semester
+                  const subject = subjects.find(
+                    (s) => s.subject === file.subject && s.semester === file.semester
+                  );
+                  const displayName = subject?.name || `Subject ${file.subject}`;
                   
                   return (
                     <li key={file.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 hover:bg-muted/50 rounded-xl transition-colors">
@@ -173,7 +186,10 @@ export default function HomeSearch() {
                         <div className="min-w-0 flex-1">
                           <h4 className="text-sm font-medium text-foreground truncate">{file.name}</h4>
                           <p className="text-xs text-muted-foreground mt-0.5 truncate flex items-center gap-1.5">
-                            <span className="font-medium text-primary/80">{subject?.name || `Subject ${file.subject}`}</span>
+                            <span className="font-semibold text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground border border-border/50">
+                              Sem {file.semester}
+                            </span>
+                            <span className="font-medium text-primary/90 truncate">{displayName}</span>
                             <span className="w-1 h-1 rounded-full bg-border"></span>
                             <span>Module {file.module}</span>
                             <span className="w-1 h-1 rounded-full bg-border"></span>
@@ -199,7 +215,7 @@ export default function HomeSearch() {
                          </button>
                       </div>
                     </li>
-                  )
+                  );
                 })}
               </ul>
             ) : (
@@ -222,7 +238,7 @@ export default function HomeSearch() {
         />
       )}
 
-      {/* PDF Viewer Viewer Modal */}
+      {/* PDF Viewer Modal */}
       {viewingFile && (
         <PdfViewerModal
           isOpen={!!viewingFile}
