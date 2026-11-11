@@ -530,6 +530,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           onView: () {
             Navigator.of(context).push(
               MaterialPageRoute(
+                settings: const RouteSettings(name: '/pdf-viewer'),
                 builder: (_) => PdfViewerScreen(
                   title: doc.name,
                   localPath: doc.localPath,

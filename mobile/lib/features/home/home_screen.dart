@@ -73,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToSemester(int semesterNumber) {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: RouteSettings(name: '/semester/$semesterNumber'),
         builder: (_) => SemesterScreen(semesterNumber: semesterNumber),
       ),
     );
@@ -81,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToSearch() {
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/search'),
         builder: (_) => const SearchScreen(),
       ),
     );
@@ -249,7 +251,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       isCompact: true,
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const DownloadsScreen()),
+                          MaterialPageRoute(
+                            settings: const RouteSettings(name: '/downloads'),
+                            builder: (_) => const DownloadsScreen(),
+                          ),
                         );
                       },
                     ),

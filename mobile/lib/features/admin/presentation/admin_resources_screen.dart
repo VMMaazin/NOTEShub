@@ -295,6 +295,7 @@ class _AdminResourcesScreenState extends State<AdminResourcesScreen> {
         label: const Text('Upload Resource', style: TextStyle(fontWeight: FontWeight.bold)),
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
+            settings: const RouteSettings(name: '/admin/upload'),
             builder: (_) => UploadResourceScreen(
               initialSemester: _filterSemester,
               initialSubject: _filterSubject,
@@ -744,6 +745,7 @@ class _AdminResourcesScreenState extends State<AdminResourcesScreen> {
                   case 'view':
                     Navigator.of(context).push(
                       MaterialPageRoute(
+                        settings: const RouteSettings(name: '/pdf-viewer'),
                         builder: (_) => PdfViewerScreen(
                           pdfUrl: file.url,
                           title: file.name,
@@ -795,6 +797,7 @@ class _AdminResourcesScreenState extends State<AdminResourcesScreen> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
+                  settings: const RouteSettings(name: '/pdf-viewer'),
                   builder: (_) => PdfViewerScreen(
                     pdfUrl: file.url,
                     title: file.name,

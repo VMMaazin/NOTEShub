@@ -122,6 +122,7 @@ class _DownloadOptionsSheetState extends State<DownloadOptionsSheet> {
     Navigator.of(context).pop();
     Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: '/pdf-viewer'),
         builder: (_) => PdfViewerScreen(
           title: widget.file.name,
           localPath: localPath,

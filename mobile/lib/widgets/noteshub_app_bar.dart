@@ -300,7 +300,10 @@ class NotesHubAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const DownloadsScreen()),
+                        MaterialPageRoute(
+                          settings: const RouteSettings(name: '/downloads'),
+                          builder: (_) => const DownloadsScreen(),
+                        ),
                       );
                     },
                   ),
@@ -399,7 +402,10 @@ class NotesHubAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/admin/login'),
+                        builder: (_) => const AdminLoginScreen(),
+                      ),
                     );
                   },
                 ),

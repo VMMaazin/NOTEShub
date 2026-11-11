@@ -510,6 +510,9 @@ class SemesterScreen extends StatelessWidget {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
+                                      settings: RouteSettings(
+                                        name: '/semester/$semesterNumber/subject/$subjectNum/module/1',
+                                      ),
                                       builder: (_) => SubjectDetailScreen(
                                         semester: semesterNumber,
                                         subject: subjectNum,

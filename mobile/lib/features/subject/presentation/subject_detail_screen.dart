@@ -6,6 +6,7 @@ import '../../../core/models/file_model.dart';
 import '../../../core/models/subject_model.dart';
 import '../../../core/repositories/file_repository.dart';
 import '../../../core/repositories/subject_repository.dart';
+import '../../../core/services/vercel_analytics_service.dart';
 import '../../../core/theme/animated_glass_background.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/royal_design_system.dart';
@@ -70,6 +71,10 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
       _selectedModule = module;
       _initStreams();
     });
+    VercelAnalyticsService.instance.trackPageView(
+      '/semester/${widget.semester}/subject/${widget.subject}/module/$module',
+      replace: true,
+    );
   }
 
   Future<void> _showRenameSubjectDialog(String currentName, String? docId) async {
@@ -797,6 +802,9 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
+                              settings: RouteSettings(
+                                name: '/admin/upload/semester/${widget.semester}/subject/${widget.subject}/module/$_selectedModule',
+                              ),
                               builder: (_) => UploadResourceScreen(
                                 initialSemester: widget.semester,
                                 initialSubject: widget.subject,
@@ -881,6 +889,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
         void openPdf() {
           Navigator.of(context).push(
             MaterialPageRoute(
+              settings: const RouteSettings(name: '/pdf-viewer'),
               builder: (_) => PdfViewerScreen(
                 title: file.name,
                 pdfUrl: file.url,

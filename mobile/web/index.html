@@ -39,6 +39,32 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js";
     }
   </script>
+
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    (function () {
+      if (document.querySelector('script[data-vercel-analytics]')) return;
+      var scriptSrc = '/_vercel/insights/script.js';
+      try {
+        if (window.VERCEL_OBSERVABILITY_CLIENT_CONFIG) {
+          var cfg = typeof window.VERCEL_OBSERVABILITY_CLIENT_CONFIG === 'string'
+            ? JSON.parse(window.VERCEL_OBSERVABILITY_CLIENT_CONFIG)
+            : window.VERCEL_OBSERVABILITY_CLIENT_CONFIG;
+          if (cfg && cfg.analytics && cfg.analytics.scriptSrc) {
+            scriptSrc = cfg.analytics.scriptSrc;
+          } else if (cfg && cfg.analytics && cfg.analytics.scriptPath) {
+            scriptSrc = cfg.analytics.scriptPath;
+          }
+        }
+      } catch (e) {}
+      var el = document.createElement('script');
+      el.setAttribute('data-vercel-analytics', 'true');
+      el.defer = true;
+      el.src = scriptSrc;
+      document.head.appendChild(el);
+    })();
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

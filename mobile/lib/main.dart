@@ -10,6 +10,7 @@ import 'core/repositories/subject_repository.dart';
 import 'core/services/download_service.dart';
 import 'core/services/offline_library_service.dart';
 import 'core/services/update_service.dart';
+import 'core/services/vercel_analytics_service.dart';
 import 'core/storage/local_storage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/bloc/auth_bloc.dart';
@@ -119,6 +120,7 @@ class NotesHubApp extends StatelessWidget {
                   theme: AppTheme.lightTheme,
                   darkTheme: AppTheme.darkTheme,
                   themeMode: themeController.themeMode,
+                  navigatorObservers: [VercelAnalyticsObserver()],
                   home: const HomeScreen(),
                 );
               },
@@ -133,6 +135,7 @@ class NotesHubApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      navigatorObservers: [VercelAnalyticsObserver()],
       home: Scaffold(
         body: Center(
           child: Padding(

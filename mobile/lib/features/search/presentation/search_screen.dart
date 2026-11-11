@@ -488,6 +488,7 @@ class _SearchViewState extends State<_SearchView> {
           onView: () {
             Navigator.of(context).push(
               MaterialPageRoute(
+                settings: const RouteSettings(name: '/pdf-viewer'),
                 builder: (_) => PdfViewerScreen(
                   title: file.name,
                   pdfUrl: file.url,

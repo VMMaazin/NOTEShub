@@ -349,7 +349,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: LucideIcons.layers,
                   accentColor: const Color(0xFF3B82F6),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const AdminSubjectsScreen()),
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: '/admin/subjects'),
+                      builder: (_) => const AdminSubjectsScreen(),
+                    ),
                   ).then((_) => _loadDashboardData()),
                 ),
               ),
@@ -361,7 +364,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: LucideIcons.bookOpen,
                   accentColor: const Color(0xFF8B5CF6),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const AdminSubjectsScreen()),
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: '/admin/subjects'),
+                      builder: (_) => const AdminSubjectsScreen(),
+                    ),
                   ).then((_) => _loadDashboardData()),
                 ),
               ),
@@ -373,7 +379,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: LucideIcons.fileText,
                   accentColor: const Color(0xFF10B981),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const AdminResourcesScreen()),
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: '/admin/resources'),
+                      builder: (_) => const AdminResourcesScreen(),
+                    ),
                   ).then((_) => _loadDashboardData()),
                 ),
               ),
@@ -392,7 +401,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     icon: LucideIcons.layers,
                     accentColor: const Color(0xFF3B82F6),
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AdminSubjectsScreen()),
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/admin/subjects'),
+                        builder: (_) => const AdminSubjectsScreen(),
+                      ),
                     ).then((_) => _loadDashboardData()),
                   ),
                 ),
@@ -404,7 +416,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     icon: LucideIcons.bookOpen,
                     accentColor: const Color(0xFF8B5CF6),
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AdminSubjectsScreen()),
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/admin/subjects'),
+                        builder: (_) => const AdminSubjectsScreen(),
+                      ),
                     ).then((_) => _loadDashboardData()),
                   ),
                 ),
@@ -417,7 +432,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               icon: LucideIcons.fileText,
               accentColor: const Color(0xFF10B981),
               onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AdminResourcesScreen()),
+                MaterialPageRoute(
+                  settings: const RouteSettings(name: '/admin/resources'),
+                  builder: (_) => const AdminResourcesScreen(),
+                ),
               ).then((_) => _loadDashboardData()),
             ),
           ],
@@ -444,7 +462,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const UploadResourceScreen()),
+              MaterialPageRoute(
+                settings: const RouteSettings(name: '/admin/upload'),
+                builder: (_) => const UploadResourceScreen(),
+              ),
             ).then((_) => _loadDashboardData()),
             borderRadius: BorderRadius.circular(16),
             child: Container(
@@ -507,7 +528,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 icon: LucideIcons.bookPlus,
                 color: const Color(0xFF8B5CF6),
                 onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AdminSubjectsScreen()),
+                  MaterialPageRoute(
+                    settings: const RouteSettings(name: '/admin/subjects'),
+                    builder: (_) => const AdminSubjectsScreen(),
+                  ),
                 ).then((_) => _loadDashboardData()),
               ),
             ),
@@ -519,7 +543,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 icon: LucideIcons.folderKanban,
                 color: const Color(0xFF3B82F6),
                 onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AdminResourcesScreen()),
+                  MaterialPageRoute(
+                    settings: const RouteSettings(name: '/admin/resources'),
+                    builder: (_) => const AdminResourcesScreen(),
+                  ),
                 ).then((_) => _loadDashboardData()),
               ),
             ),
@@ -703,6 +730,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
+              settings: const RouteSettings(name: '/pdf-viewer'),
               builder: (_) => PdfViewerScreen(
                 pdfUrl: file.url,
                 title: file.name,
