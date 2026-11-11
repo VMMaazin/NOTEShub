@@ -5,19 +5,20 @@ echo "=========================================================="
 echo "  NOTEShub — Vercel Production Build for Flutter Web      "
 echo "=========================================================="
 
-# 1. Ensure Flutter SDK is available
-if command -v flutter >/dev/null 2>&1; then
-  echo "==> Detected system Flutter SDK: $(flutter --version | head -n 1)"
+# 1. Deterministic Flutter SDK Configuration
+# Pins Flutter to the exact tested release (3.38.7) to prevent breaking changes
+# from unpinned 'stable' updates. Can be overridden via Vercel env variable.
+FLUTTER_VERSION="${FLUTTER_VERSION:-3.38.7}"
+FLUTTER_ROOT="${HOME}/flutter-${FLUTTER_VERSION}"
+
+if [ ! -d "${FLUTTER_ROOT}" ]; then
+  echo "==> Flutter SDK not found. Shallow cloning Flutter version ${FLUTTER_VERSION} into ${FLUTTER_ROOT}..."
+  git clone https://github.com/flutter/flutter.git --depth 1 -b "${FLUTTER_VERSION}" "${FLUTTER_ROOT}"
 else
-  FLUTTER_ROOT="${HOME}/flutter"
-  if [ ! -d "${FLUTTER_ROOT}" ]; then
-    echo "==> Flutter SDK not found. Shallow cloning Flutter stable into ${FLUTTER_ROOT}..."
-    git clone https://github.com/flutter/flutter.git --depth 1 -b stable "${FLUTTER_ROOT}"
-  else
-    echo "==> Found cached Flutter SDK at ${FLUTTER_ROOT}"
-  fi
-  export PATH="${PATH}:${FLUTTER_ROOT}/bin"
+  echo "==> Found cached Flutter SDK at ${FLUTTER_ROOT}"
 fi
+
+export PATH="${FLUTTER_ROOT}/bin:${PATH}"
 
 # 2. Display environment version info
 echo "==> Using Flutter:"
@@ -46,4 +47,3 @@ else
   echo "==> Error: build/web/index.html was not generated!"
   exit 1
 fi
-
