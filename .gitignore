@@ -1,36 +1,33 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Root .gitignore for NOTEShub monorepo
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
+# Miscellaneous
+*.log
+*.tmp
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
+# Sensitive credentials & keys (NEVER COMMIT)
+*.keystore
+*.jks
+**/key.properties
 .env
 .env*.local
+*service-account*.json
+*serviceAccount*.json
 
-# vercel
-.vercel
+# Mobile (Flutter) build outputs & caches
+mobile/build/
+**/build/
+.gradle/
+**/android/.gradle/
+mobile/release/
+mobile/.dart_tool/
+mobile/.flutter-plugins-dependencies
+mobile/.pub-cache/
+mobile/.pub/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Web (Next.js) build outputs & dependencies
+project/node_modules/
+project/.next/
+project/out/
+project/.vercel/

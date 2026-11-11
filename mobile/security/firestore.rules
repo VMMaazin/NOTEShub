@@ -1,0 +1,154 @@
+// ==============================================================================
+// PROPOSED FIRESTORE SECURITY RULES (PROPOSAL ONLY — NOT DEPLOYED)
+// ==============================================================================
+// Project: smart-college-notes
+// Applications: NOTEShub Next.js + Flutter Multi-Platform App
+//
+// NOTICE:
+// This file is a recommended security specification. Actual deployed Firebase
+// rules cannot be inspected or altered from the client app without Firebase CLI
+// deployment privileges. Deploying or modifying live rules is strictly outside
+// the mobile migration scope.
+//
+// SECURITY MODEL:
+// 1. PUBLIC STUDENT ACCESS: Unauthenticated read-only access to 'subjects' and 'files'.
+// 2. ROLE GATING: Admin mutations (create/update) on 'subjects' and 'files' require
+//    an authenticated user whose document in 'users/$(request.auth.uid)' has
+//    role == 'owner' or role == 'author' (or request.auth.uid == 'U8YkrUlxR9OLwB2XPiwi8AiOo372').
+// 3. ROLE TAMPERING PREVENTION: Users CANNOT create or modify their own 'role' field
+//    in the 'users' collection; roles can only be provisioned by an 'owner' or Admin SDK.
+// 4. RESOURCE DELETION: Document deletion in 'files' is permitted for authenticated
+//    authors/owners. Cloudinary RAW storage assets are preserved; this removes only the academic record.
+// ==============================================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwnerBootstrap() {
+      return isAuthenticated() && request.auth.uid == 'U8YkrUlxR9OLwB2XPiwi8AiOo372';
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAuthor() {
+      return isAuthenticated() && (
+        isOwnerBootstrap() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (getUserData().role == 'author' || getUserData().role == 'owner'))
+      );
+    }
+
+    function isOwner() {
+      return isAuthenticated() && (
+        isOwnerBootstrap() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role == 'owner')
+      );
+    }
+
+    // --------------------------------------------------------------------------
+    // 1. SUBJECTS COLLECTION
+    // Schema:
+    //   semester: int (1..8)
+    //   subject: int (1..8)
+    //   name: string (non-empty)
+    // --------------------------------------------------------------------------
+    match /subjects/{subjectId} {
+      // Public student access: Anyone can read subjects
+      allow read: if true;
+
+      // Only verified authors/owners can create or rename subjects
+      allow create: if isAuthor()
+        && request.resource.data.semester is int
+        && request.resource.data.semester >= 1
+        && request.resource.data.semester <= 8
+        && request.resource.data.subject is int
+        && request.resource.data.subject >= 1
+        && request.resource.data.subject <= 8
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0;
+
+      allow update: if isAuthor()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.semester == resource.data.semester
+        && request.resource.data.subject == resource.data.subject;
+
+      // Subject deletion restricted to owners only
+      allow delete: if isOwner();
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. FILES COLLECTION
+    // Schema:
+    //   semester: int (1..8)
+    //   subject: int
+    //   module: int (1..5)
+    //   type: string ('notes' | 'qbank' | 'extra')
+    //   name: string (non-empty)
+    //   url: string (must be secure Cloudinary URL)
+    //   publicId: string (non-empty)
+    //   createdAt: optional timestamp
+    // --------------------------------------------------------------------------
+    match /files/{fileId} {
+      // Public student access: Anyone can browse files
+      allow read: if true;
+
+      // Only verified authors/owners can insert newly uploaded file records
+      allow create: if isAuthor()
+        && request.resource.data.semester is int
+        && request.resource.data.subject is int
+        && request.resource.data.module is int
+        && request.resource.data.module >= 1
+        && request.resource.data.module <= 5
+        && request.resource.data.type in ['notes', 'qbank', 'extra']
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.url is string
+        && request.resource.data.publicId is string;
+
+      // Renaming files allowed by authors; immutable academic coordinates
+      allow update: if isAuthor()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.semester == resource.data.semester
+        && request.resource.data.subject == resource.data.subject
+        && request.resource.data.module == resource.data.module
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.publicId == resource.data.publicId
+        && request.resource.data.url == resource.data.url;
+
+      // Only authenticated authors/owners can delete file documents from Firestore.
+      // Cloudinary RAW storage assets are preserved; this removes only the academic record.
+      allow delete: if isAuthor();
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. USERS COLLECTION
+    // Schema:
+    //   role: optional string ('owner' | 'author')
+    //   name: optional string
+    // --------------------------------------------------------------------------
+    match /users/{userId} {
+      // Users can read their own profile to determine roles
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAuthor());
+
+      // Users can update their own display name, BUT NEVER THEIR ROLE
+      allow update: if isAuthenticated() && request.auth.uid == userId
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+        && (request.resource.data.name is string);
+
+      // Only owners can assign or change roles
+      allow write: if isOwner();
+    }
+  }
+}
+
