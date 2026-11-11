@@ -32,6 +32,10 @@ class AppConstants {
   static const String appVersion = '1.0.1';
   static const int appVersionCode = 2;
 
+  // Android APK Download URL
+  static const String androidApkDownloadUrl =
+      'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk';
+
   // In-App Update Configuration
   static const String updateMetadataUrl =
       'https://raw.githubusercontent.com/VMMaazin/NOTEShub/main/mobile/version.json';

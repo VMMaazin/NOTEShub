@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/repositories/subject_repository.dart';
@@ -16,7 +18,12 @@ import '../semester/presentation/semester_screen.dart';
 import '../update/presentation/update_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool? showAndroidDownload;
+
+  const HomeScreen({
+    super.key,
+    this.showAndroidDownload,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -68,6 +75,26 @@ class _HomeScreenState extends State<HomeScreen> {
   void _fetchSemesters() {
     final subjectRepo = context.read<SubjectRepository>();
     _availableSemestersFuture = subjectRepo.getAvailableSemesters();
+  }
+
+  Future<void> _downloadAndroidApk() async {
+    final uri = Uri.parse(AppConstants.androidApkDownloadUrl);
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open APK download URL. Please visit GitHub Releases.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('APK download launch error: $e');
+    }
   }
 
   void _navigateToSemester(int semesterNumber) {
@@ -242,19 +269,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 20),
 
-                  // 4. Quick Action Pill: Offline Library
+                  // 4. Quick Action Buttons
                   SubtleEntranceAnimation(
                     delayMs: 220,
-                    child: RoyalLiquidGlassButton(
-                      label: 'Offline Library',
-                      icon: Icons.download_for_offline_rounded,
-                      isCompact: true,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            settings: const RouteSettings(name: '/downloads'),
-                            builder: (_) => const DownloadsScreen(),
-                          ),
+                    child: Builder(
+                      builder: (context) {
+                        final showDownload = widget.showAndroidDownload ??
+                            (kIsWeb || defaultTargetPlatform != TargetPlatform.android);
+
+                        return Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 10,
+                          children: [
+                            if (showDownload)
+                              RoyalLiquidGlassButton(
+                                label: 'Download for Android',
+                                icon: Icons.android_rounded,
+                                isCompact: true,
+                                isGold: true,
+                                onTap: _downloadAndroidApk,
+                              ),
+                            RoyalLiquidGlassButton(
+                              label: 'Offline Library',
+                              icon: Icons.download_for_offline_rounded,
+                              isCompact: true,
+                              isGold: !showDownload,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    settings: const RouteSettings(name: '/downloads'),
+                                    builder: (_) => const DownloadsScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         );
                       },
                     ),

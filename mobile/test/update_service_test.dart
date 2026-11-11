@@ -57,6 +57,26 @@ void main() {
       expect(model.releaseNotes, contains('New dark mode'));
     });
 
+    test('Actual mobile/version.json file is valid and parses with UpdateInfoModel', () {
+      final file = File('version.json');
+      expect(file.existsSync(), isTrue);
+      final content = file.readAsStringSync();
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      final model = UpdateInfoModel.fromJson(json);
+
+      expect(model.version, '1.0.1');
+      expect(model.versionCode, 2);
+      expect(model.apkUrl, 'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk');
+      expect(model.forceUpdate, isFalse);
+    });
+
+    test('AppConstants contains correct Android APK and metadata URLs', () {
+      expect(AppConstants.androidApkDownloadUrl,
+          'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk');
+      expect(AppConstants.updateMetadataUrl,
+          'https://raw.githubusercontent.com/VMMaazin/NOTEShub/main/mobile/version.json');
+    });
+
     test('Version comparison correctly evaluates update availability against versionCode', () {
       final model = UpdateInfoModel(
         version: '1.0.2',

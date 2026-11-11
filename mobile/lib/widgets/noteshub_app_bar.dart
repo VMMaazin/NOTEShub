@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/constants/app_constants.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/theme_controller.dart';
@@ -323,6 +325,22 @@ class NotesHubAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               );
             },
+          ),
+
+        // Android APK Download Action (visible on Web)
+        if (kIsWeb)
+          IconButton(
+            tooltip: 'Download NOTEShub for Android (APK)',
+            visualDensity: isNarrow ? VisualDensity.compact : VisualDensity.standard,
+            icon: Icon(
+              Icons.android_rounded,
+              size: isNarrow ? 20 : 22,
+              color: isDark ? RoyalColors.champagne : const Color(0xFF8A6715),
+            ),
+            onPressed: () => launchUrl(
+              Uri.parse(AppConstants.androidApkDownloadUrl),
+              mode: LaunchMode.externalApplication,
+            ),
           ),
 
         // 2. Theme Toggle Action (Sun / Moon)

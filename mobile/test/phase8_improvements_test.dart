@@ -137,6 +137,42 @@ void main() {
       expect(find.text('Semester 8'), findsNothing);
     });
 
+    testWidgets('Home page renders Download for Android button and footer link', (tester) async {
+      final subjectRepo = MockSubjectRepository();
+      final authRepo = FakeAuthRepository();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MultiRepositoryProvider(
+            providers: [
+              RepositoryProvider<SubjectRepository>.value(value: subjectRepo),
+              RepositoryProvider<AuthRepository>.value(value: authRepo),
+            ],
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider<AuthBloc>(
+                  create: (_) => AuthBloc(authRepository: authRepo),
+                ),
+                BlocProvider<DownloadCubit>(
+                  create: (_) => DownloadCubit(
+                    downloadService: FakeDownloadService(),
+                    libraryService: FakeOfflineLibraryService(),
+                  ),
+                ),
+              ],
+              child: const HomeScreen(showAndroidDownload: true),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Download for Android'), findsOneWidget);
+      expect(find.text('Offline Library'), findsOneWidget);
+      expect(find.textContaining('Download NOTEShub for Android'), findsOneWidget);
+    });
+
     testWidgets('NotesHubAcademicCard without badgeText renders title and omits slot badges', (tester) async {
       await tester.pumpWidget(
         MaterialApp(

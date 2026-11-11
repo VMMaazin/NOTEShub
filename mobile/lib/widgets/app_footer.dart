@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/constants/app_constants.dart';
 import '../core/theme/app_colors.dart';
 
@@ -53,6 +54,39 @@ class AppFooter extends StatelessWidget {
               color: isDark
                   ? RoyalColors.textSlateMuted
                   : RoyalColors.textNavySubtle,
+            ),
+          ),
+          const SizedBox(height: 14),
+          InkWell(
+            onTap: () => launchUrl(
+              Uri.parse(AppConstants.androidApkDownloadUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.android_rounded,
+                    size: 15,
+                    color: isDark ? RoyalColors.champagne : const Color(0xFF8A6715),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Download NOTEShub for Android (v${AppConstants.appVersion} APK)',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? RoyalColors.champagne : const Color(0xFF8A6715),
+                      decoration: TextDecoration.underline,
+                      decorationColor: (isDark ? RoyalColors.champagne : const Color(0xFF8A6715))
+                          .withValues(alpha: 0.4),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
