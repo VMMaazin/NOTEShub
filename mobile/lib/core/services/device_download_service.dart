@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,8 +19,14 @@ import 'dart:io' if (dart.library.html) '../storage/web_storage_stub.dart' as io
 /// DOES NOT register files in the in-app Offline Library.
 class DeviceDownloadService {
   final Dio _dio;
+  static final Set<String> _activeDownloads = <String>{};
+  static const MethodChannel _androidChannel =
+      MethodChannel('app.noteshub.mobile/device_download');
 
   DeviceDownloadService({Dio? dio}) : _dio = dio ?? ApiClient.client;
+
+  /// Whether a device download is currently active for [fileId].
+  bool isDownloading(String fileId) => _activeDownloads.contains(fileId);
 
   /// Downloads [file] directly to user-accessible device storage.
   Future<String> downloadToDevice({
@@ -39,42 +46,146 @@ class DeviceDownloadService {
       }
     }
 
-    final safeBaseName = FileUtils.sanitizeFileName(file.name);
-    final downloadUrl = file.url.isNotEmpty ? file.url : file.downloadUrl;
+    final fileId = file.id;
+    if (_activeDownloads.contains(fileId)) {
+      throw StateError('Download is already in progress for "${file.name}".');
+    }
+    _activeDownloads.add(fileId);
 
-    // 2. Android: save to public Downloads folder
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      String? targetDirPath;
-      try {
-        final downloads = await getDownloadsDirectory();
-        targetDirPath = downloads?.path;
-      } catch (_) {}
+    try {
+      final safeBaseName = FileUtils.sanitizeFileName(file.name);
+      final downloadUrl = file.url.isNotEmpty ? file.url : file.downloadUrl;
 
-      // Fallback to standard external storage Download path
-      targetDirPath ??= '/storage/emulated/0/Download';
-      final dirObj = io.Directory(targetDirPath);
-      if (!dirObj.existsSync()) {
+      if (downloadUrl.trim().isEmpty) {
+        throw ArgumentError('Download URL is empty for file "${file.name}".');
+      }
+
+      // 2. Android: download to temp and save to public Downloads via MediaStore
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        final tempDir = await getTemporaryDirectory();
+        final tempPath =
+            '${tempDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}_$safeBaseName';
+        final tempFile = io.File(tempPath);
+
         try {
-          await dirObj.create(recursive: true);
-        } catch (_) {
-          final ext = await getExternalStorageDirectory();
-          if (ext != null) {
-            targetDirPath = ext.path;
+          final response = await _dio.download(
+            downloadUrl,
+            tempPath,
+            cancelToken: cancelToken,
+            onReceiveProgress: (received, total) {
+              if (onProgress != null && total > 0) {
+                onProgress(received, total);
+              }
+            },
+            options: Options(
+              responseType: ResponseType.bytes,
+              followRedirects: true,
+              validateStatus: (status) =>
+                  status != null && status >= 200 && status < 300,
+            ),
+          );
+
+          if (response.statusCode != 200) {
+            throw DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+              error:
+                  'Server returned HTTP ${response.statusCode} while downloading file.',
+            );
+          }
+
+          if (!tempFile.existsSync() ||
+              (tempFile as dynamic).lengthSync() <= 0) {
+            throw StateError('Downloaded file is empty (0 bytes).');
+          }
+
+          final headerBytes = await FileUtils.readFileHeader(tempFile);
+          if (!FileUtils.hasPdfSignature(headerBytes)) {
+            throw StateError(
+              'Downloaded document is invalid or corrupted (missing standard %PDF file signature).',
+            );
+          }
+
+          String savedLocation = 'Downloads/$safeBaseName';
+          try {
+            final result = await _androidChannel.invokeMethod<String>(
+              'savePdfToDownloads',
+              {
+                'filePath': tempPath,
+                'fileName': safeBaseName,
+              },
+            );
+            if (result != null && result.isNotEmpty) {
+              savedLocation = result;
+            }
+          } on MissingPluginException {
+            debugPrint(
+                'Native device download channel not registered in current environment (e.g. testing).');
+          }
+
+          final fileName = savedLocation.split(RegExp(r'[\\/]')).last;
+          return 'Saved to device Downloads: $fileName';
+        } finally {
+          if (tempFile.existsSync()) {
+            try {
+              await tempFile.delete();
+            } catch (_) {}
           }
         }
       }
 
-      String targetPath = '$targetDirPath/$safeBaseName';
-      // Ensure unique filename if file already exists
-      int counter = 1;
-      final dotIndex = safeBaseName.lastIndexOf('.');
-      final nameWithoutExt = dotIndex != -1 ? safeBaseName.substring(0, dotIndex) : safeBaseName;
-      final ext = dotIndex != -1 ? safeBaseName.substring(dotIndex) : '.pdf';
+      // 3. iOS: save to temporary location and trigger native Share/Save to Files interface
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final tempDir = await getTemporaryDirectory();
+        final tempPath = '${tempDir.path}/$safeBaseName';
+        final tempFile = io.File(tempPath);
 
-      while (io.File(targetPath).existsSync()) {
-        targetPath = '$targetDirPath/$nameWithoutExt ($counter)$ext';
-        counter++;
+        final response = await _dio.download(
+          downloadUrl,
+          tempPath,
+          cancelToken: cancelToken,
+          onReceiveProgress: onProgress,
+          options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: true,
+            validateStatus: (status) =>
+                status != null && status >= 200 && status < 300,
+          ),
+        );
+
+        if (response.statusCode != 200) {
+          throw DioException(
+            requestOptions: response.requestOptions,
+            response: response,
+            error:
+                'Server returned HTTP ${response.statusCode} while downloading.',
+          );
+        }
+
+        if (!tempFile.existsSync() ||
+            (tempFile as dynamic).lengthSync() <= 0) {
+          if (tempFile.existsSync()) await tempFile.delete();
+          throw StateError('File download was empty or unreadable.');
+        }
+
+        final headerBytes = await FileUtils.readFileHeader(tempFile);
+        if (!FileUtils.hasPdfSignature(headerBytes)) {
+          await tempFile.delete();
+          throw StateError(
+            'Downloaded document is invalid or corrupted (missing standard %PDF file signature).',
+          );
+        }
+
+        final xFile =
+            XFile(tempPath, name: safeBaseName, mimeType: 'application/pdf');
+        await Share.shareXFiles([xFile], text: file.name);
+        return 'Presented native Save to Files interface.';
       }
+
+      // 4. Desktop platforms (Windows, macOS, Linux)
+      final docDir =
+          await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+      final targetPath = '${docDir.path}/$safeBaseName';
 
       final response = await _dio.download(
         downloadUrl,
@@ -84,7 +195,8 @@ class DeviceDownloadService {
         options: Options(
           responseType: ResponseType.bytes,
           followRedirects: true,
-          validateStatus: (status) => status != null && status >= 200 && status < 300,
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 300,
         ),
       );
 
@@ -92,62 +204,29 @@ class DeviceDownloadService {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: 'Server returned HTTP ${response.statusCode} while downloading.',
+          error:
+              'Server returned HTTP ${response.statusCode} while downloading.',
         );
       }
 
       final savedFile = io.File(targetPath);
-      if (!savedFile.existsSync() || (savedFile as dynamic).lengthSync() <= 0) {
+      if (!savedFile.existsSync() ||
+          (savedFile as dynamic).lengthSync() <= 0) {
         if (savedFile.existsSync()) await savedFile.delete();
         throw StateError('File download was empty or unreadable.');
       }
 
-      final fileName = targetPath.split(RegExp(r'[\\/]')).last;
-      return 'Saved to device Downloads: $fileName';
-    }
-
-    // 3. iOS: save to temporary location and trigger native Share/Save to Files interface
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/$safeBaseName';
-
-      final response = await _dio.download(
-        downloadUrl,
-        tempPath,
-        cancelToken: cancelToken,
-        onReceiveProgress: onProgress,
-      );
-
-      if (response.statusCode != 200) {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          error: 'Server returned HTTP ${response.statusCode} while downloading.',
+      final headerBytes = await FileUtils.readFileHeader(savedFile);
+      if (!FileUtils.hasPdfSignature(headerBytes)) {
+        await savedFile.delete();
+        throw StateError(
+          'Downloaded document is invalid or corrupted (missing standard %PDF file signature).',
         );
       }
 
-      final savedFile = io.File(tempPath);
-      if (!savedFile.existsSync()) {
-        throw StateError('Failed to prepare document for device saving.');
-      }
-
-      final xFile = XFile(tempPath, name: safeBaseName, mimeType: 'application/pdf');
-      await Share.shareXFiles([xFile], text: file.name);
-      return 'Presented native Save to Files interface.';
+      return 'Saved to: $targetPath';
+    } finally {
+      _activeDownloads.remove(fileId);
     }
-
-    // 4. Desktop platforms (Windows, macOS, Linux)
-    final docDir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
-    final targetPath = '${docDir.path}/$safeBaseName';
-
-    await _dio.download(
-      downloadUrl,
-      targetPath,
-      cancelToken: cancelToken,
-      onReceiveProgress: onProgress,
-    );
-
-    return 'Saved to: $targetPath';
   }
 }
-

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Manages and persists the user's selected application theme mode for NOTEShub.
-/// Defaults to [ThemeMode.dark] to showcase the signature Royal Academic Glassmorphism aesthetic.
+/// Defaults to [ThemeMode.light] for standard clean reading appearance.
 class ThemeController extends ChangeNotifier {
   ThemeController._();
 
@@ -10,7 +10,7 @@ class ThemeController extends ChangeNotifier {
 
   static const String _prefKey = 'noteshub_theme_mode';
 
-  ThemeMode _themeMode = ThemeMode.dark;
+  ThemeMode _themeMode = ThemeMode.light;
   bool _initialized = false;
 
   ThemeMode get themeMode => _themeMode;
@@ -22,7 +22,7 @@ class ThemeController extends ChangeNotifier {
   @visibleForTesting
   void resetForTesting() {
     _initialized = false;
-    _themeMode = ThemeMode.dark;
+    _themeMode = ThemeMode.light;
   }
 
   /// Initializes the theme controller and loads persisted preference from disk.
@@ -31,15 +31,15 @@ class ThemeController extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(_prefKey);
-      if (saved == 'light') {
+      if (saved == 'dark') {
+        _themeMode = ThemeMode.dark;
+      } else if (saved == 'light') {
         _themeMode = ThemeMode.light;
-      } else if (saved == 'dark') {
-        _themeMode = ThemeMode.dark;
       } else {
-        _themeMode = ThemeMode.dark;
+        _themeMode = ThemeMode.light;
       }
     } catch (_) {
-      _themeMode = ThemeMode.dark;
+      _themeMode = ThemeMode.light;
     } finally {
       _initialized = true;
       notifyListeners();

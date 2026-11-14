@@ -74,7 +74,18 @@ class _DownloadOptionsSheetState extends State<DownloadOptionsSheet> {
 
       messenger.showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
           backgroundColor: RoyalColors.emeraldActive,
           behavior: SnackBarBehavior.floating,
         ),
@@ -85,9 +96,40 @@ class _DownloadOptionsSheetState extends State<DownloadOptionsSheet> {
         _isDeviceDownloading = false;
       });
 
+      String friendlyMessage = e.toString();
+      if (e is DioException) {
+        if (e.response?.statusCode == 404) {
+          friendlyMessage = 'Document file not found on server (HTTP 404).';
+        } else if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          friendlyMessage =
+              'Download timed out. Please check your internet connection.';
+        } else if (e.type == DioExceptionType.connectionError) {
+          friendlyMessage =
+              'No internet connection. Please verify your network and retry.';
+        } else {
+          friendlyMessage = 'Download failed: ${e.message ?? e.toString()}';
+        }
+      } else if (e is StateError) {
+        friendlyMessage = e.message;
+      } else if (e is ArgumentError) {
+        friendlyMessage = e.message.toString();
+      }
+
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Device download failed: $e'),
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  friendlyMessage,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
           backgroundColor: const Color(0xFFDC2626),
           behavior: SnackBarBehavior.floating,
         ),
@@ -148,102 +190,104 @@ class _DownloadOptionsSheetState extends State<DownloadOptionsSheet> {
             ? downloadState.allDocuments.firstWhere((d) => d.id == widget.file.id)
             : null;
 
-        return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xF20B1224) : const Color(0xF7FAF7F0),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                border: Border(
-                  top: BorderSide(
-                    color: isDark ? RoyalColors.glassGoldBorder : RoyalColors.ivoryBorder,
-                    width: 1.2,
-                  ),
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Drag handle
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        gradient: RoyalGradients.metallicGold,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+        return PopScope(
+          canPop: !_isDeviceDownloading,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xF20B1224) : const Color(0xF7FAF7F0),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border(
+                    top: BorderSide(
+                      color: isDark ? RoyalColors.glassGoldBorder : RoyalColors.ivoryBorder,
+                      width: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Title Row
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Drag handle
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 4,
                         decoration: BoxDecoration(
                           gradient: RoyalGradients.metallicGold,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: RoyalColors.royalGold.withValues(alpha: 0.35),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.download_rounded,
-                          size: 20,
-                          color: RoyalColors.midnightNavy,
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Download Document',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: isDark ? RoyalColors.pearlWhite : RoyalColors.midnightNavy,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Title Row
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: RoyalGradients.metallicGold,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: RoyalColors.royalGold.withValues(alpha: 0.35),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              widget.file.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? RoyalColors.textSlateMuted : RoyalColors.textNavyMuted,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.download_rounded,
+                            size: 20,
+                            color: RoyalColors.midnightNavy,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Download Document',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark ? RoyalColors.pearlWhite : RoyalColors.midnightNavy,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                widget.file.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? RoyalColors.textSlateMuted : RoyalColors.textNavyMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
 
-                  const SizedBox(height: 22),
+                    const SizedBox(height: 22),
 
-                  // 1. EXACT LABEL: Download in App
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: isDownloading
-                          ? null
-                          : isDownloaded && offlineDoc != null
-                              ? () => _openOfflineReader(context, offlineDoc.localPath)
-                              : () => _handleAppDownload(context),
+                    // 1. EXACT LABEL: Download in App
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: (isDownloading || _isDeviceDownloading)
+                            ? null
+                            : isDownloaded && offlineDoc != null
+                                ? () => _openOfflineReader(context, offlineDoc.localPath)
+                                : () => _handleAppDownload(context),
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -403,8 +447,9 @@ class _DownloadOptionsSheetState extends State<DownloadOptionsSheet> {
               ),
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 }

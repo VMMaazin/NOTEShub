@@ -134,7 +134,9 @@ class NotesHubApp extends StatelessWidget {
     return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeController.instance.themeMode,
       navigatorObservers: [VercelAnalyticsObserver()],
       home: Scaffold(
         body: Center(

@@ -462,18 +462,14 @@ class SemesterScreen extends StatelessWidget {
                       LayoutBuilder(
                         builder: (context, constraints) {
                           int crossAxisCount = 4;
-                          double childAspectRatio = 1.18;
 
                           if (constraints.maxWidth < 480) {
                             crossAxisCount = 1;
-                            childAspectRatio = 1.95;
                           } else if (constraints.maxWidth < 720) {
                             crossAxisCount = 2;
-                            childAspectRatio = 1.28;
                           } else {
                             // Sufficiently wide screens: exactly 4 subjects per row
                             crossAxisCount = 4;
-                            childAspectRatio = 1.16;
                           }
 
                           return GridView.builder(
@@ -481,7 +477,7 @@ class SemesterScreen extends StatelessWidget {
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: crossAxisCount,
-                              childAspectRatio: childAspectRatio,
+                              mainAxisExtent: 185,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
                             ),

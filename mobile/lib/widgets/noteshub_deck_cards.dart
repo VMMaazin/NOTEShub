@@ -63,51 +63,50 @@ class _NotesHubAcademicCardState extends State<NotesHubAcademicCard> {
           scale: _isHovered && widget.isActive ? 1.02 : 1.0,
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: bgFill,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: borderColor, width: borderWidth),
-              boxShadow: _isHovered && widget.isActive
-                  ? (isDark
-                      ? [
-                          BoxShadow(
-                            color: RoyalColors.cyanInteractive.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                          const BoxShadow(
-                            color: Color(0x33090F22),
-                            blurRadius: 16,
-                            offset: Offset(0, 4),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: RoyalColors.royalGold.withValues(alpha: 0.2),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ])
-                  : (isDark
-                      ? const [
-                          BoxShadow(
-                            color: Color(0x26000000),
-                            blurRadius: 12,
-                            offset: Offset(0, 4),
-                          ),
-                        ]
-                      : RoyalShadows.subtleCard),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+                decoration: BoxDecoration(
+                  color: bgFill,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: borderColor, width: borderWidth),
+                  boxShadow: _isHovered && widget.isActive
+                      ? (isDark
+                          ? [
+                              BoxShadow(
+                                color: RoyalColors.cyanInteractive.withValues(alpha: 0.15),
+                                blurRadius: 20,
+                                offset: const Offset(0, 6),
+                              ),
+                              const BoxShadow(
+                                color: Color(0x33090F22),
+                                blurRadius: 16,
+                                offset: Offset(0, 4),
+                              ),
+                            ]
+                          : [
+                              BoxShadow(
+                                color: RoyalColors.royalGold.withValues(alpha: 0.2),
+                                blurRadius: 18,
+                                offset: const Offset(0, 6),
+                              ),
+                            ])
+                      : (isDark
+                          ? const [
+                              BoxShadow(
+                                color: Color(0x26000000),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ]
+                          : RoyalShadows.subtleCard),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Top row: Emblem + Status badge + Optional Admin action
                     Row(
@@ -224,36 +223,39 @@ class _NotesHubAcademicCardState extends State<NotesHubAcademicCard> {
 
                     const SizedBox(height: 8),
 
-                    // Middle: Title & Subtitle
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                            color: isDark ? RoyalColors.pearlWhite : RoyalColors.midnightNavy,
+                    // Middle: Title & Subtitle (flexibly expands so bottom action never gets cut)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.3,
+                              color: isDark ? RoyalColors.pearlWhite : RoyalColors.midnightNavy,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.subtitle,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: isDark ? RoyalColors.textSlateMuted : RoyalColors.textNavyMuted,
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.subtitle,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? RoyalColors.textSlateMuted : RoyalColors.textNavyMuted,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
                     // Bottom: Action Nav Link with Animated Arrow
                     Row(

@@ -375,7 +375,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context, constraints) {
                           final isWide = constraints.maxWidth >= 600;
                           final crossAxisCount = isWide ? 2 : 1;
-                          final childAspectRatio = isWide ? 1.75 : 2.2;
 
                           // Only Semester 5 and Semester 4, strictly in that order
                           const semesterList = [5, 4];
@@ -388,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: crossAxisCount,
-                                  childAspectRatio: childAspectRatio,
+                                  mainAxisExtent: 185,
                                   crossAxisSpacing: 16,
                                   mainAxisSpacing: 16,
                                 ),
