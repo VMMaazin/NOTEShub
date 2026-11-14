@@ -64,15 +64,15 @@ void main() {
       final json = jsonDecode(content) as Map<String, dynamic>;
       final model = UpdateInfoModel.fromJson(json);
 
-      expect(model.version, '1.0.1');
-      expect(model.versionCode, 2);
-      expect(model.apkUrl, 'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk');
+      expect(model.version, '1.0.2');
+      expect(model.versionCode, 3);
+      expect(model.apkUrl, 'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.2.apk');
       expect(model.forceUpdate, isFalse);
     });
 
     test('AppConstants contains correct Android APK and metadata URLs', () {
       expect(AppConstants.androidApkDownloadUrl,
-          'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk');
+          'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.2.apk');
       expect(AppConstants.updateMetadataUrl,
           'https://raw.githubusercontent.com/VMMaazin/NOTEShub/main/mobile/version.json');
     });

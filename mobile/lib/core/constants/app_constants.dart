@@ -29,12 +29,12 @@ class AppConstants {
   static const double desktopBreakpoint = 1200.0;
 
   // App Version Information
-  static const String appVersion = '1.0.1';
-  static const int appVersionCode = 2;
+  static const String appVersion = '1.0.2';
+  static const int appVersionCode = 3;
 
   // Android APK Download URL
   static const String androidApkDownloadUrl =
-      'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.1.apk';
+      'https://github.com/VMMaazin/NOTEShub/releases/latest/download/NOTEShub-v1.0.2.apk';
 
   // In-App Update Configuration
   static const String updateMetadataUrl =
